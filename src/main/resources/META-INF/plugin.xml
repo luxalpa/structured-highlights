@@ -1,15 +1,17 @@
 <!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
 <idea-plugin>
-    <id>com.github.luxalpa.luxidearustextension</id>
-    <name>lux-idea-rust-extension</name>
-    <vendor>luxalpa</vendor>
+    <id>com.luxalpa.luxrustextension</id>
+    <name>Lux Rust Extension</name>
+    <vendor>Luxalpa</vendor>
 
     <depends>com.intellij.modules.platform</depends>
+    <depends>com.jetbrains.rust</depends>
 
     <resource-bundle>messages.MyBundle</resource-bundle>
 
     <extensions defaultExtensionNs="com.intellij">
-        <toolWindow factoryClass="com.github.luxalpa.luxidearustextension.toolWindow.MyToolWindowFactory" id="MyToolWindow"/>
-        <postStartupActivity implementation="com.github.luxalpa.luxidearustextension.startup.MyProjectActivity" />
+        <!--        <toolWindow factoryClass="com.luxalpa.luxrustextension.toolWindow.MyToolWindowFactory" id="MyToolWindow"/>-->
+        <!--        <postStartupActivity implementation="com.luxalpa.luxrustextension.startup.MyProjectActivity"/>-->
+        <highlightingPassFactory implementation="com.luxalpa.luxrustextension.LxHighlightingPassFactory"/>
     </extensions>
 </idea-plugin>

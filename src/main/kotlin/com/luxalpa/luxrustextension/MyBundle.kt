@@ -1,4 +1,4 @@
-package com.github.luxalpa.luxidearustextension
+package com.luxalpa.luxrustextension
 
 import com.intellij.DynamicBundle
 import org.jetbrains.annotations.NonNls

@@ -1,9 +1,9 @@
-package com.github.luxalpa.luxidearustextension.services
+package com.luxalpa.luxrustextension.services
 
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
-import com.github.luxalpa.luxidearustextension.MyBundle
+import com.luxalpa.luxrustextension.MyBundle
 
 @Service(Service.Level.PROJECT)
 class MyProjectService(project: Project) {

@@ -1,4 +1,4 @@
-package com.github.luxalpa.luxidearustextension.startup
+package com.luxalpa.luxrustextension.startup
 
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
