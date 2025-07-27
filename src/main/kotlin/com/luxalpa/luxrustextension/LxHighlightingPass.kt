@@ -8,12 +8,16 @@ import com.intellij.codeHighlighting.TextEditorHighlightingPassRegistrar
 import com.intellij.codeHighlighting.TextEditorHighlightingPassRegistrar.Anchor
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.markup.CustomHighlighterRenderer
+import com.intellij.openapi.editor.markup.EffectType
+import com.intellij.openapi.editor.markup.HighlighterLayer
 import com.intellij.openapi.editor.markup.HighlighterTargetArea
 import com.intellij.openapi.editor.markup.RangeHighlighter
+import com.intellij.openapi.editor.markup.TextAttributes
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Key
+import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.util.endOffset
 import com.intellij.psi.util.startOffset
@@ -27,6 +31,7 @@ import org.rust.lang.core.psi.RsRecursiveVisitor
 import org.rust.lang.core.psi.RsStructItem
 import org.rust.lang.core.psi.RsTraitItem
 import java.awt.Color
+import java.awt.Font
 
 class LxHighlightingPassFactory : TextEditorHighlightingPassFactoryRegistrar, TextEditorHighlightingPassFactory,
     DumbAware {
@@ -49,26 +54,37 @@ class LxHighlightingPassFactory : TextEditorHighlightingPassFactoryRegistrar, Te
     ): TextEditorHighlightingPass = LxHighlightingPass(file, editor)
 }
 
-const val COLOR_STRENGTH: Int = 180
-const val COLOR_MIDDLE: Int = 110
-const val COLOR_BASE: Int = 10
-const val COLOR_ALPHA: Int = 10
+const val COLOR_STRENGTH: Float = 0.6f
+const val COLOR_MIDDLE: Float = 0.4f
+const val COLOR_BASE: Float = 0.1f
+const val COLOR_ALPHA: Float = 0.035f
+const val HEADING_ALPHA: Float = 0.1f
+const val SUBHEADING_ALPHA: Float = 0.06f
 
 enum class BlockType {
     ENUM,
     STRUCT,
     TRAIT,
     IMPL,
-    MODULE,
-    FUNCTION;
+    FUNCTION,
+    MODULE;
 
     fun toColor(): Color = when (this) {
-        ENUM -> Color(COLOR_STRENGTH, COLOR_BASE, COLOR_STRENGTH, COLOR_ALPHA)
-        STRUCT -> Color(COLOR_BASE, COLOR_BASE, COLOR_STRENGTH, COLOR_ALPHA)
-        TRAIT -> Color(COLOR_BASE, COLOR_STRENGTH, COLOR_BASE, COLOR_ALPHA)
-        IMPL -> Color(COLOR_STRENGTH, COLOR_MIDDLE, COLOR_BASE, COLOR_ALPHA)
-        MODULE -> Color(COLOR_STRENGTH, COLOR_STRENGTH, COLOR_STRENGTH, COLOR_ALPHA)
-        FUNCTION -> Color(COLOR_STRENGTH, COLOR_BASE, COLOR_BASE, COLOR_ALPHA)
+        ENUM -> Color(COLOR_STRENGTH, COLOR_BASE, COLOR_STRENGTH)
+        STRUCT -> Color(COLOR_BASE, COLOR_BASE, COLOR_STRENGTH)
+        TRAIT -> Color(COLOR_BASE, COLOR_STRENGTH, COLOR_BASE)
+        IMPL -> Color(0.6f, 0.4f, 0.1f)
+        FUNCTION -> Color(COLOR_STRENGTH, COLOR_BASE, COLOR_BASE)
+        MODULE -> Color(COLOR_MIDDLE, COLOR_MIDDLE, COLOR_MIDDLE)
+    }
+
+    fun toHeadingBackgroundColor(): Color = when (this) {
+        ENUM -> Color(COLOR_STRENGTH, COLOR_BASE, COLOR_STRENGTH)
+        STRUCT -> Color(COLOR_BASE, COLOR_BASE, COLOR_STRENGTH)
+        TRAIT -> Color(COLOR_BASE, COLOR_STRENGTH, COLOR_BASE)
+        IMPL -> Color(0.95f, 0.92f, 0.9f)
+        FUNCTION -> Color(0.6f, 0.2f, 0.2f)
+        MODULE -> Color(COLOR_MIDDLE, COLOR_MIDDLE, COLOR_MIDDLE)
     }
 }
 
@@ -81,8 +97,16 @@ class DefinitionBlockDescriptor(
     val startOffset: Int,
     val endOffset: Int,
     val blockType: BlockType,
+    val actualType: BlockType,
+    val alpha: Float = COLOR_ALPHA,
     val mode: Mode = Mode.FULL_LINE
 )
+
+enum class Kind {
+    Header, Subheader, Identifier
+}
+
+data class Descriptor(val kind: Kind, val element: PsiElement)
 
 private val LX_DESCRIPTORS: Key<List<DefinitionBlockDescriptor>> = Key.create("LX_DESCRIPTORS")
 private val LX_HIGHLIGHTERS: Key<List<RangeHighlighter>> = Key.create("LX_HIGHLIGHTERS")
@@ -99,54 +123,150 @@ class LxHighlightingPass(
         file.accept(object : RsRecursiveVisitor() {
             var curBlockType: BlockType? = null
 
-            override fun visitStructItem(o: RsStructItem) {
+            private fun handleBlockType(
+                defaultType: BlockType,
+                useForChildren: Boolean = true,
+                visit: (blockType: BlockType) -> Unit
+            ) {
                 val isTopLevel = curBlockType == null
-                curBlockType = curBlockType ?: BlockType.STRUCT
-                definitions += DefinitionBlockDescriptor(o.startOffset, o.endOffset, curBlockType!!)
-                super.visitStructItem(o)
+                val newBlockType = curBlockType ?: defaultType
+                if (useForChildren) {
+                    curBlockType = newBlockType
+                }
+                visit(newBlockType)
                 if (isTopLevel) curBlockType = null
             }
 
+            override fun visitStructItem(o: RsStructItem) {
+                handleBlockType(BlockType.STRUCT) { blockType ->
+                    definitions += DefinitionBlockDescriptor(o.startOffset, o.endOffset, blockType, BlockType.STRUCT)
+                    o.identifier?.let { identifier ->
+                        definitions += DefinitionBlockDescriptor(
+                            identifier.startOffset,
+                            identifier.endOffset,
+                            blockType,
+                            BlockType.STRUCT,
+                            HEADING_ALPHA
+                        )
+                        definitions += DefinitionBlockDescriptor(
+                            identifier.startOffset,
+                            identifier.endOffset,
+                            blockType,
+                            BlockType.STRUCT,
+                            mode = Mode.EXACT_RANGE
+                        )
+                    }
+                    super.visitStructItem(o)
+                }
+            }
+
             override fun visitImplItem(o: RsImplItem) {
-                val isTopLevel = curBlockType == null
-                curBlockType = curBlockType ?: BlockType.IMPL
-                definitions += DefinitionBlockDescriptor(o.startOffset, o.endOffset, curBlockType!!)
-                super.visitImplItem(o)
-                if (isTopLevel) curBlockType = null
+                handleBlockType(BlockType.IMPL) { blockType ->
+                    definitions += DefinitionBlockDescriptor(o.startOffset, o.endOffset, blockType, BlockType.IMPL)
+                    o.typeReference?.let { typeReference ->
+                        definitions += DefinitionBlockDescriptor(
+                            typeReference.startOffset,
+                            typeReference.endOffset,
+                            blockType,
+                            BlockType.IMPL,
+                            HEADING_ALPHA
+                        )
+                        definitions += DefinitionBlockDescriptor(
+                            typeReference.startOffset,
+                            typeReference.endOffset,
+                            blockType,
+                            BlockType.IMPL,
+                            mode = Mode.EXACT_RANGE
+                        )
+                    }
+                    o.traitRef?.let { traitRef ->
+                        definitions += DefinitionBlockDescriptor(
+                            traitRef.startOffset,
+                            traitRef.endOffset,
+                            blockType,
+                            BlockType.IMPL,
+                            mode = Mode.EXACT_RANGE
+                        )
+                    }
+                    super.visitImplItem(o)
+                }
             }
 
             override fun visitFunction(o: RsFunction) {
                 val isTopLevel = curBlockType == null
-                curBlockType = curBlockType ?: BlockType.FUNCTION
-                definitions += DefinitionBlockDescriptor(o.startOffset, o.endOffset, curBlockType!!)
-                super.visitFunction(o)
-                if (isTopLevel) curBlockType = null
+                handleBlockType(BlockType.FUNCTION) { blockType ->
+                    definitions += DefinitionBlockDescriptor(o.startOffset, o.endOffset, blockType, BlockType.FUNCTION)
+                    definitions += DefinitionBlockDescriptor(
+                        o.identifier.startOffset,
+                        o.identifier.endOffset,
+                        blockType,
+                        BlockType.FUNCTION,
+                        if (isTopLevel) HEADING_ALPHA else SUBHEADING_ALPHA
+                    )
+                    definitions += DefinitionBlockDescriptor(
+                        o.identifier.startOffset,
+                        o.identifier.endOffset,
+                        blockType,
+                        BlockType.FUNCTION,
+                        mode = Mode.EXACT_RANGE
+                    )
+                    super.visitFunction(o)
+                }
             }
 
             override fun visitModItem(o: RsModItem) {
                 // Modules will still be colored like their parents, but freestanding modules will not pass on their
                 // color to their children.
-                val isTopLevel = curBlockType == null
-                val blockType = curBlockType ?: BlockType.MODULE
-                definitions += DefinitionBlockDescriptor(o.startOffset, o.endOffset, blockType)
-                super.visitModItem(o)
-                if (isTopLevel) curBlockType = null
+                handleBlockType(BlockType.MODULE, false) { blockType ->
+                    definitions += DefinitionBlockDescriptor(o.startOffset, o.endOffset, blockType, BlockType.MODULE)
+                    definitions += DefinitionBlockDescriptor(
+                        o.identifier.startOffset,
+                        o.identifier.endOffset,
+                        blockType,
+                        BlockType.MODULE,
+                        HEADING_ALPHA
+                    )
+                    super.visitModItem(o)
+                }
             }
 
             override fun visitTraitItem(o: RsTraitItem) {
-                val isTopLevel = curBlockType == null
-                curBlockType = curBlockType ?: BlockType.TRAIT
-                definitions += DefinitionBlockDescriptor(o.startOffset, o.endOffset, curBlockType!!)
-                super.visitTraitItem(o)
-                if (isTopLevel) curBlockType = null
+                handleBlockType(BlockType.TRAIT) { blockType ->
+                    definitions += DefinitionBlockDescriptor(o.startOffset, o.endOffset, blockType, BlockType.TRAIT)
+                    o.identifier?.let { identifier ->
+                        definitions += DefinitionBlockDescriptor(
+                            identifier.startOffset,
+                            identifier.endOffset,
+                            blockType,
+                            BlockType.TRAIT,
+                            HEADING_ALPHA
+                        )
+                    }
+                    super.visitTraitItem(o)
+                }
             }
 
             override fun visitEnumItem(o: RsEnumItem) {
-                val isTopLevel = curBlockType == null
-                curBlockType = curBlockType ?: BlockType.ENUM
-                definitions += DefinitionBlockDescriptor(o.startOffset, o.endOffset, curBlockType!!)
-                super.visitEnumItem(o)
-                if (isTopLevel) curBlockType = null
+                handleBlockType(BlockType.ENUM) { blockType ->
+                    definitions += DefinitionBlockDescriptor(o.startOffset, o.endOffset, blockType, BlockType.ENUM)
+                    o.identifier?.let { identifier ->
+                        definitions += DefinitionBlockDescriptor(
+                            identifier.startOffset,
+                            identifier.endOffset,
+                            blockType,
+                            BlockType.ENUM,
+                            HEADING_ALPHA
+                        )
+                        definitions += DefinitionBlockDescriptor(
+                            identifier.startOffset,
+                            identifier.endOffset,
+                            blockType,
+                            BlockType.ENUM,
+                            mode = Mode.EXACT_RANGE
+                        )
+                    }
+                    super.visitEnumItem(o)
+                }
             }
         })
 
@@ -164,15 +284,53 @@ class LxHighlightingPass(
         val newHighlighters = mutableListOf<RangeHighlighter>()
 
         for (descriptor in descriptors) {
-            val highlighter = markupModel.addRangeHighlighter(
-                descriptor.startOffset,
-                descriptor.endOffset,
-                -1,
-                null,
-                HighlighterTargetArea.LINES_IN_RANGE
-            )
+            val highlighter = if (descriptor.mode == Mode.EXACT_RANGE) {
+                markupModel.addRangeHighlighter(
+                    descriptor.startOffset,
+                    descriptor.endOffset,
+                    HighlighterLayer.GUARDED_BLOCKS + 1,
+//                    if (descriptor.actualType == BlockType.FUNCTION) {
+                    TextAttributes(
+//                            Color(0.4f, 0.3f, 0.1f),
+                        Color(0.0f, 0.0f, 0.0f),
+//                            null,
+                        Color(0.96f, 0.95f, 0.93f),
+                        null,
+                        null,
+//                            Color(0.4f, 0.3f, 0.1f),
+//                            EffectType.BOLD_LINE_UNDERSCORE,
+                        Font.PLAIN
+                    ),
+//                    } else {
+//                        TextAttributes(
+//                            null,
+////                        Color(1.0f, 1.0f, 1.0f),
+//                            null,
+////                        descriptor.blockType.toHeadingBackgroundColor(),
+//                            //Color(0.6f, 0.6f, 1.0f),
+//                            null,
+//                            null,
+////                        Color(0.5f, 0.5f, 0.9f),
+////                        EffectType.SLIGHTLY_WIDER_BOX,
+//                            Font.BOLD
+//                        )
+//                    },
 
-            highlighter.customRenderer = LxHighlightingRenderer(descriptor.blockType)
+                    HighlighterTargetArea.EXACT_RANGE
+                )
+            } else {
+                val highlighter = markupModel.addRangeHighlighter(
+                    descriptor.startOffset,
+                    descriptor.endOffset,
+                    -1,
+                    null,
+                    HighlighterTargetArea.LINES_IN_RANGE
+                )
+
+                highlighter.customRenderer = LxHighlightingRenderer(descriptor.blockType, descriptor.alpha)
+
+                highlighter
+            }
 
             newHighlighters.add(highlighter)
         }
@@ -183,7 +341,7 @@ class LxHighlightingPass(
 
 }
 
-class LxHighlightingRenderer(val blockType: BlockType) : CustomHighlighterRenderer {
+class LxHighlightingRenderer(val blockType: BlockType, val alpha: Float) : CustomHighlighterRenderer {
     override fun paint(editor: Editor, highlighter: RangeHighlighter, g: java.awt.Graphics) {
         val startLine = editor.offsetToVisualLine(highlighter.startOffset, true)
         val endLine = editor.offsetToVisualLine(highlighter.endOffset, false)
@@ -193,7 +351,8 @@ class LxHighlightingRenderer(val blockType: BlockType) : CustomHighlighterRender
         val height = endPosY - startPosY
         val width = editor.contentComponent.width
 
-        val customColor = JBColor(blockType.toColor(), blockType.toColor()) // light/dark
+        val baseColor = blockType.toColor()
+        val customColor = Color(baseColor.red / 255f, baseColor.green / 255f, baseColor.blue / 255f, alpha)
 
         g.color = customColor
         g.fillRect(0, startPosY, width, height)
