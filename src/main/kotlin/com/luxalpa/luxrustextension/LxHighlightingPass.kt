@@ -103,7 +103,7 @@ class DefinitionBlockDescriptor(
 )
 
 enum class Kind {
-    Header, Subheader, Identifier
+    Block, Header, Subheader, Identifier
 }
 
 data class Descriptor(val kind: Kind, val element: PsiElement)
@@ -125,91 +125,84 @@ class LxHighlightingPass(
 
             private fun handleBlockType(
                 defaultType: BlockType,
+                descriptors: List<Descriptor>,
                 useForChildren: Boolean = true,
-                visit: (blockType: BlockType) -> Unit
+                visit: () -> Unit
             ) {
                 val isTopLevel = curBlockType == null
                 val newBlockType = curBlockType ?: defaultType
                 if (useForChildren) {
                     curBlockType = newBlockType
                 }
-                visit(newBlockType)
+
+                for (descriptor in descriptors) {
+                    val alpha = when (descriptor.kind) {
+                        Kind.Block -> COLOR_ALPHA
+                        Kind.Header, Kind.Identifier -> HEADING_ALPHA
+                        Kind.Subheader -> SUBHEADING_ALPHA
+                    }
+
+                    val mode = when (descriptor.kind) {
+                        Kind.Block, Kind.Header, Kind.Subheader -> Mode.FULL_LINE
+                        Kind.Identifier -> Mode.EXACT_RANGE
+                    }
+
+                    definitions += DefinitionBlockDescriptor(
+                        descriptor.element.startOffset,
+                        descriptor.element.endOffset,
+                        newBlockType,
+                        defaultType,
+                        alpha,
+                        mode
+                    )
+                }
+
+                visit()
                 if (isTopLevel) curBlockType = null
             }
 
             override fun visitStructItem(o: RsStructItem) {
-                handleBlockType(BlockType.STRUCT) { blockType ->
-                    definitions += DefinitionBlockDescriptor(o.startOffset, o.endOffset, blockType, BlockType.STRUCT)
-                    o.identifier?.let { identifier ->
-                        definitions += DefinitionBlockDescriptor(
-                            identifier.startOffset,
-                            identifier.endOffset,
-                            blockType,
-                            BlockType.STRUCT,
-                            HEADING_ALPHA
-                        )
-                        definitions += DefinitionBlockDescriptor(
-                            identifier.startOffset,
-                            identifier.endOffset,
-                            blockType,
-                            BlockType.STRUCT,
-                            mode = Mode.EXACT_RANGE
-                        )
+                val descriptors = buildList {
+                    add(Descriptor(Kind.Block, o))
+                    o.identifier?.let {
+                        add(Descriptor(Kind.Header, it))
+                        add(Descriptor(Kind.Identifier, it))
                     }
+                }
+
+                handleBlockType(BlockType.STRUCT, descriptors) {
                     super.visitStructItem(o)
                 }
             }
 
             override fun visitImplItem(o: RsImplItem) {
-                handleBlockType(BlockType.IMPL) { blockType ->
-                    definitions += DefinitionBlockDescriptor(o.startOffset, o.endOffset, blockType, BlockType.IMPL)
-                    o.typeReference?.let { typeReference ->
-                        definitions += DefinitionBlockDescriptor(
-                            typeReference.startOffset,
-                            typeReference.endOffset,
-                            blockType,
-                            BlockType.IMPL,
-                            HEADING_ALPHA
-                        )
-                        definitions += DefinitionBlockDescriptor(
-                            typeReference.startOffset,
-                            typeReference.endOffset,
-                            blockType,
-                            BlockType.IMPL,
-                            mode = Mode.EXACT_RANGE
-                        )
+                val descriptors = buildList {
+                    add(Descriptor(Kind.Block, o))
+                    o.typeReference?.let {
+                        add(Descriptor(Kind.Header, it))
+                        add(Descriptor(Kind.Identifier, it))
                     }
-                    o.traitRef?.let { traitRef ->
-                        definitions += DefinitionBlockDescriptor(
-                            traitRef.startOffset,
-                            traitRef.endOffset,
-                            blockType,
-                            BlockType.IMPL,
-                            mode = Mode.EXACT_RANGE
-                        )
+                    o.traitRef?.let {
+                        add(Descriptor(Kind.Identifier, it))
                     }
+                }
+
+                handleBlockType(BlockType.IMPL, descriptors) {
                     super.visitImplItem(o)
                 }
             }
 
             override fun visitFunction(o: RsFunction) {
                 val isTopLevel = curBlockType == null
-                handleBlockType(BlockType.FUNCTION) { blockType ->
-                    definitions += DefinitionBlockDescriptor(o.startOffset, o.endOffset, blockType, BlockType.FUNCTION)
-                    definitions += DefinitionBlockDescriptor(
-                        o.identifier.startOffset,
-                        o.identifier.endOffset,
-                        blockType,
-                        BlockType.FUNCTION,
-                        if (isTopLevel) HEADING_ALPHA else SUBHEADING_ALPHA
-                    )
-                    definitions += DefinitionBlockDescriptor(
-                        o.identifier.startOffset,
-                        o.identifier.endOffset,
-                        blockType,
-                        BlockType.FUNCTION,
-                        mode = Mode.EXACT_RANGE
-                    )
+                val descriptors = buildList {
+                    add(Descriptor(Kind.Block, o))
+                    o.identifier.let {
+                        add(Descriptor(if (isTopLevel) Kind.Header else Kind.Subheader, it))
+                        add(Descriptor(Kind.Identifier, it))
+                    }
+                }
+
+                handleBlockType(BlockType.FUNCTION, descriptors) {
                     super.visitFunction(o)
                 }
             }
@@ -217,54 +210,43 @@ class LxHighlightingPass(
             override fun visitModItem(o: RsModItem) {
                 // Modules will still be colored like their parents, but freestanding modules will not pass on their
                 // color to their children.
-                handleBlockType(BlockType.MODULE, false) { blockType ->
-                    definitions += DefinitionBlockDescriptor(o.startOffset, o.endOffset, blockType, BlockType.MODULE)
-                    definitions += DefinitionBlockDescriptor(
-                        o.identifier.startOffset,
-                        o.identifier.endOffset,
-                        blockType,
-                        BlockType.MODULE,
-                        HEADING_ALPHA
-                    )
+                val descriptors = buildList {
+                    add(Descriptor(Kind.Block, o))
+                    o.identifier.let {
+                        add(Descriptor(Kind.Header, it))
+                        add(Descriptor(Kind.Identifier, it))
+                    }
+                }
+
+                handleBlockType(BlockType.MODULE, descriptors, false) {
                     super.visitModItem(o)
                 }
             }
 
             override fun visitTraitItem(o: RsTraitItem) {
-                handleBlockType(BlockType.TRAIT) { blockType ->
-                    definitions += DefinitionBlockDescriptor(o.startOffset, o.endOffset, blockType, BlockType.TRAIT)
-                    o.identifier?.let { identifier ->
-                        definitions += DefinitionBlockDescriptor(
-                            identifier.startOffset,
-                            identifier.endOffset,
-                            blockType,
-                            BlockType.TRAIT,
-                            HEADING_ALPHA
-                        )
+                val descriptors = buildList {
+                    add(Descriptor(Kind.Block, o))
+                    o.identifier?.let {
+                        add(Descriptor(Kind.Header, it))
+                        add(Descriptor(Kind.Identifier, it))
                     }
+                }
+
+                handleBlockType(BlockType.TRAIT, descriptors) {
                     super.visitTraitItem(o)
                 }
             }
 
             override fun visitEnumItem(o: RsEnumItem) {
-                handleBlockType(BlockType.ENUM) { blockType ->
-                    definitions += DefinitionBlockDescriptor(o.startOffset, o.endOffset, blockType, BlockType.ENUM)
-                    o.identifier?.let { identifier ->
-                        definitions += DefinitionBlockDescriptor(
-                            identifier.startOffset,
-                            identifier.endOffset,
-                            blockType,
-                            BlockType.ENUM,
-                            HEADING_ALPHA
-                        )
-                        definitions += DefinitionBlockDescriptor(
-                            identifier.startOffset,
-                            identifier.endOffset,
-                            blockType,
-                            BlockType.ENUM,
-                            mode = Mode.EXACT_RANGE
-                        )
+                val descriptors = buildList {
+                    add(Descriptor(Kind.Block, o))
+                    o.identifier?.let {
+                        add(Descriptor(Kind.Header, it))
+                        add(Descriptor(Kind.Identifier, it))
                     }
+                }
+
+                handleBlockType(BlockType.ENUM, descriptors) {
                     super.visitEnumItem(o)
                 }
             }
