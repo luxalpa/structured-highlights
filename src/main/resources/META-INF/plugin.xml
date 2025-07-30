@@ -1,7 +1,7 @@
 <!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
 <idea-plugin>
-    <id>com.luxalpa.luxrustextension</id>
-    <name>Lux Rust Extension</name>
+    <id>com.luxalpa.structuredhighlights</id>
+    <name>Structured Highlights</name>
     <vendor>Luxalpa</vendor>
 
     <depends>com.intellij.modules.platform</depends>
@@ -10,8 +10,10 @@
     <resource-bundle>messages.MyBundle</resource-bundle>
 
     <extensions defaultExtensionNs="com.intellij">
-        <!--        <toolWindow factoryClass="com.luxalpa.luxrustextension.toolWindow.MyToolWindowFactory" id="MyToolWindow"/>-->
-        <!--        <postStartupActivity implementation="com.luxalpa.luxrustextension.startup.MyProjectActivity"/>-->
-        <highlightingPassFactory implementation="com.luxalpa.luxrustextension.LxHighlightingPassFactory"/>
+        <!--        <postStartupActivity implementation="com.luxalpa.structuredhighlights.startup.MyProjectActivity"/>-->
+        <applicationConfigurable instance="com.luxalpa.structuredhighlights.LxConfigurable"
+                                 displayName="Lux Configurable"/>
+        <colorAndFontPanelFactory implementation="com.luxalpa.structuredhighlights.LxColorsPageFactory"/>
+        <highlightingPassFactory implementation="com.luxalpa.structuredhighlights.LxHighlightingPassFactory"/>
     </extensions>
 </idea-plugin>

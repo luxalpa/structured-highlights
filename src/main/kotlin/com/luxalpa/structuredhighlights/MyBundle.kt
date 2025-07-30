@@ -1,4 +1,4 @@
-package com.luxalpa.luxrustextension
+package com.luxalpa.structuredhighlights
 
 import com.intellij.DynamicBundle
 import org.jetbrains.annotations.NonNls
