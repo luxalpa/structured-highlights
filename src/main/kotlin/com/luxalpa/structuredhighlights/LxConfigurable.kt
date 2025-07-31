@@ -1,28 +1,28 @@
 package com.luxalpa.structuredhighlights
 
-import com.intellij.openapi.application.ReadAction
-import com.intellij.openapi.editor.Document
+import com.intellij.lang.Language
 import com.intellij.openapi.editor.colors.EditorFontType
 import com.intellij.openapi.editor.ex.EditorEx
 import com.intellij.openapi.options.Configurable
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.project.ProjectLocator
 import com.intellij.openapi.project.ProjectManager
+import com.intellij.openapi.util.Key
 import com.intellij.openapi.util.NlsContexts
-import com.intellij.openapi.util.ThrowableComputable
-import com.intellij.psi.PsiDocumentManager
-import com.intellij.psi.PsiFile
-import com.intellij.psi.PsiFileFactory
-import com.intellij.ui.EditorTextField
-import com.intellij.util.LocalTimeCounter
-import com.intellij.util.ui.FormBuilder
-import org.rust.lang.RsFileType
+import com.intellij.ui.ColorPanel
+import com.intellij.ui.JBColor
+import com.intellij.ui.LanguageTextField
+import com.intellij.ui.components.JBScrollPane
+import com.intellij.ui.dsl.builder.panel
+import com.intellij.util.ui.JBUI
+import java.awt.BorderLayout
+import java.awt.Color
 import javax.swing.JComponent
+import javax.swing.JPanel
 
-class LxConfigurable : Configurable {
+class LxConfigurable : Configurable, Configurable.NoScroll, Configurable.NoMargin {
     var mySettingsComponent: AppSettingsComponent? = null
 
-    override fun getDisplayName(): @NlsContexts.ConfigurableName String? = "Lux Configurable"
+    override fun getDisplayName(): @NlsContexts.ConfigurableName String? = "Structured Highlights"
 
     override fun createComponent(): JComponent? {
         mySettingsComponent = AppSettingsComponent()
@@ -30,7 +30,8 @@ class LxConfigurable : Configurable {
     }
 
     override fun getPreferredFocusedComponent(): JComponent? {
-        return mySettingsComponent?.getPreferredFocusedComponent()
+        return null
+//        return mySettingsComponent?.getPreferredFocusedComponent()
     }
 
     override fun isModified(): Boolean {
@@ -46,106 +47,144 @@ class LxConfigurable : Configurable {
     }
 }
 
-
-class MyLanguageTextField(val myProject: Project, text: String) :
-    EditorTextField(this.createDocument(text, myProject), myProject, RsFileType) {
-    //    LanguageTextField(Language.findLanguageByID("Rust")!!, project, text, false) {
-    companion object {
-        fun createDocument(value: String, project: Project): Document {
-            val factory = PsiFileFactory.getInstance(project)
-            val stamp = LocalTimeCounter.currentTime()
-
-            val psiFile = ReadAction.compute<PsiFile, RuntimeException> {
-                factory.createFileFromText("preview.rs", RsFileType, value, stamp, true, false)
-            }
-            // No need to guess project in getDocument - we already know it
-            val document: Document?
-            ProjectLocator.withPreferredProject(psiFile.virtualFile, project).use { ignored ->
-                document = ReadAction.compute<Document?, java.lang.RuntimeException?>(ThrowableComputable {
-                    PsiDocumentManager.getInstance(project).getDocument(psiFile)
-                })
-            }
-            checkNotNull(document)
-            return document!!
-        }
-    }
-
-    override fun createEditor(): EditorEx {
-        val editor = super.createEditor()
-        editor.isEmbeddedIntoDialogWrapper = true
-//        editor.highlighter = HighlighterFactory.createHighlighter(project, RsFileType)
-        editor.setHorizontalScrollbarVisible(true)
-        editor.setVerticalScrollbarVisible(true)
-        editor.settings.isLineNumbersShown = true
-        editor.settings.isAutoCodeFoldingEnabled = true
-        editor.isOneLineMode = false
-        return editor
-    }
-}
+val LUX_PREVIEW_COLOR: Key<Color> = Key.create("LUX_PREVIEW_COLOR")
 
 class AppSettingsComponent {
-    val myMainPanel: JComponent
-    val textField: MyLanguageTextField
+    val myMainPanel: JPanel
+    val textField: LxLanguageTextField
+    val colorSelect: ColorPanel
 
     init {
         val openProjects = ProjectManager.getInstance().openProjects
         val project = if (openProjects.isNotEmpty()) openProjects[0] else ProjectManager.getInstance().defaultProject
 
-        textField = MyLanguageTextField(project, getPreviewText())
-        textField.font = EditorFontType.PLAIN.globalFont
+        textField = LxLanguageTextField(project, getPreviewText())
+        colorSelect = ColorPanel()
 
-        myMainPanel = FormBuilder.createFormBuilder()
-            .addComponentFillVertically(textField, 0)
-//            .addComponentFillVertically(JPanel(), 0)
-            .panel
+        colorSelect.addActionListener { event ->
+            val color = colorSelect.selectedColor
+            textField.editor?.putUserData(LUX_PREVIEW_COLOR, color)
+        }
+
+        myMainPanel = JPanel(BorderLayout())
+
+        val leftPanel = panel {
+            row("Structs:") { cell(colorSelect) }
+            row { label("Label 2") }
+            row { label("Label 3") }
+            row { label("Label 3") }
+            row { label("Label 3") }
+            row { label("Label 3") }
+            row { label("Label 3") }
+            row { label("Label 3") }
+            row { label("Label 3") }
+            row { label("Label 3") }
+            row { label("Label 3") }
+            row { label("Label 3") }
+            row { label("Label 3") }
+            row { label("Label 3") }
+            row { label("Label 3") }
+            row { label("Label 3") }
+            row { label("Label 3") }
+            row { label("Label 3") }
+            row { label("Label 3") }
+            row { label("Label 3") }
+            row { label("Label 3") }
+            row { label("Label 3") }
+            row { label("Label 3") }
+            row { label("Label 3") }
+            row { label("Label 3") }
+            row { label("Label 3") }
+            row { label("Label 3") }
+            row { label("Label 3") }
+            row { label("Label 3") }
+        }
+
+        leftPanel.border = JBUI.Borders.empty(10)
+
+        val scrollPanel = JBScrollPane(leftPanel)
+        scrollPanel.border = JBUI.Borders.empty()
+        textField.editor?.setBorder(JBUI.Borders.empty())
+
+        myMainPanel.border = JBUI.Borders.customLine(JBColor.border(), 1, 0, 0, 0)
+        myMainPanel.add(scrollPanel, BorderLayout.WEST)
+        myMainPanel.add(textField, BorderLayout.CENTER)
     }
 
     fun getPanel(): JComponent = myMainPanel
-    fun getPreferredFocusedComponent(): JComponent = textField
 
     fun getPreviewText(): String = """
-            use glam::Vec3;
-            use itertools::Itertools;
-            use serde::{Deserialize, Serialize};
-            use std::collections::HashMap;
-            use std::fmt::Display;
-            use std::iter;
-            
-            #[derive(Debug, Serialize, Deserialize)]
-            #[serde(rename_all = "snake_case")]
-            pub enum RawAttributeData {
-                Float(Vec<f32>),
-                Int(Vec<i32>),
-                String(Vec<String>),
+            trait Terrible {
+                fn breathe_fire(&self);
+                fn devour(&self, num_people: usize);
             }
-            
-            impl RawAttributeData {
-                pub fn len(&self) -> usize {
-                    match self {
-                        RawAttributeData::Float(v) => v.len(),
-                        RawAttributeData::Int(v) => v.len(),
-                        RawAttributeData::String(v) => v.len(),
-                    }
-                }
-            
-                pub fn kind(&self) -> AttributeType {
-                    match self {
-                        RawAttributeData::Float(_) => AttributeType::Float,
-                        RawAttributeData::Int(_) => AttributeType::Int,
-                        RawAttributeData::String(_) => AttributeType::String,
-                    }
+
+            #[derive(Clone, Debug)]
+            struct Dragon {
+                pub name: String,
+                pub age: f32
+            }
+
+            impl Dragon {
+                pub fn roar(&self) {
+                    println!("Roar!!!");
                 }
             }
-            
-            #[derive(Debug, Serialize, Deserialize)]
-            pub struct RawAttribute {
-                pub len: usize,
-                pub data: RawAttributeData,
+
+            impl Terrible for Dragon {
+                fn breathe_fire(&self) {
+                    println!("Breathing fire!");
+                    self.roar();
+                }
+                fn devour(&self, num_people: usize) {
+                    println!("Devouring {} snacks", num_people);
+                    self.roar();
+                }
+            }
+
+            enum Weapon {
+                Tail,
+                Claws { num_talons: usize },
+                Wings,
+                Teeth(usize),
+                Fire,
+            }
+
+            #[cfg(test)]
+            mod tests {
+                use super::*;
+
+                fn test_dragon() {
+                    let dragon = Dragon {
+                        name: "Smaug".to_string(),
+                        age: 7000.0,
+                    };
+
+                    dragon.breathe_fire();
+                }
             }
         """.trimIndent()
+}
 
-//    fun getTextFieldText(): String = textField.text
-//    fun setTextFieldText(newText: String) {
-//        textField.text = newText
-//    }
+class LxLanguageTextField(project: Project, text: String) :
+    LanguageTextField(Language.findLanguageByID("Rust")!!, project, text, false) {
+
+    init {
+        this.font = EditorFontType.PLAIN.globalFont
+    }
+
+    override fun createEditor(): EditorEx {
+        val editor = super.createEditor()
+        editor.setHorizontalScrollbarVisible(true)
+        editor.setVerticalScrollbarVisible(true)
+        editor.settings.isLineNumbersShown = true
+        editor.settings.isAutoCodeFoldingEnabled = true
+        editor.settings.isFoldingOutlineShown = true
+        editor.settings.isIndentGuidesShown = true
+        editor.settings.isLineMarkerAreaShown = true
+        editor.settings.isCaretRowShown = true
+        editor.isOneLineMode = false
+        editor.setBorder(JBUI.Borders.customLine(JBColor.border(), 0, 1, 0, 1))
+        return editor
+    }
 }

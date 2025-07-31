@@ -140,7 +140,11 @@ class LxHighlightingPass(
                     HighlighterTargetArea.LINES_IN_RANGE
                 )
 
-                highlighter.customRenderer = LxHighlightingRenderer(descriptor.blockType, descriptor.alpha)
+                val colorOverride = editor.getUserData(LUX_PREVIEW_COLOR)
+
+                highlighter.customRenderer = LxHighlightingRenderer(
+                    descriptor.blockType, descriptor.alpha, colorOverride
+                )
 
                 highlighter
             }
@@ -153,7 +157,8 @@ class LxHighlightingPass(
     }
 }
 
-class LxHighlightingRenderer(val blockType: BlockType, val alpha: Float) : CustomHighlighterRenderer {
+class LxHighlightingRenderer(val blockType: BlockType, val alpha: Float, val colorOverride: Color?) :
+    CustomHighlighterRenderer {
     override fun paint(editor: Editor, highlighter: RangeHighlighter, g: java.awt.Graphics) {
         val startLine = editor.offsetToVisualLine(highlighter.startOffset, true)
         val endLine = editor.offsetToVisualLine(highlighter.endOffset, false)
@@ -163,7 +168,7 @@ class LxHighlightingRenderer(val blockType: BlockType, val alpha: Float) : Custo
         val height = endPosY - startPosY
         val width = editor.contentComponent.width
 
-        val baseColor = blockType.toColor()
+        val baseColor = colorOverride ?: blockType.toColor()
         val customColor = Color(baseColor.red / 255f, baseColor.green / 255f, baseColor.blue / 255f, alpha)
 
         g.color = customColor
