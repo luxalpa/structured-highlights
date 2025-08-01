@@ -6,12 +6,14 @@ import com.intellij.openapi.editor.ex.EditorEx
 import com.intellij.openapi.options.Configurable
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectManager
+import com.intellij.openapi.ui.DialogPanel
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.util.NlsContexts
 import com.intellij.ui.ColorPanel
 import com.intellij.ui.JBColor
 import com.intellij.ui.LanguageTextField
 import com.intellij.ui.components.JBScrollPane
+import com.intellij.ui.dsl.builder.bindText
 import com.intellij.ui.dsl.builder.panel
 import com.intellij.util.ui.JBUI
 import java.awt.BorderLayout
@@ -20,30 +22,29 @@ import javax.swing.JComponent
 import javax.swing.JPanel
 
 class LxConfigurable : Configurable, Configurable.NoScroll, Configurable.NoMargin {
-    var mySettingsComponent: AppSettingsComponent? = null
+    lateinit var mySettingsComponent: AppSettingsComponent
 
-    override fun getDisplayName(): @NlsContexts.ConfigurableName String? = "Structured Highlights"
+    override fun getDisplayName(): @NlsContexts.ConfigurableName String? = MyBundle.message("pluginName")
 
     override fun createComponent(): JComponent? {
         mySettingsComponent = AppSettingsComponent()
-        return mySettingsComponent!!.getPanel()
+        return mySettingsComponent.getPanel()
     }
 
     override fun getPreferredFocusedComponent(): JComponent? {
         return null
-//        return mySettingsComponent?.getPreferredFocusedComponent()
     }
 
     override fun isModified(): Boolean {
-        return false
+        return mySettingsComponent.dialogPanel.isModified()
     }
 
     override fun apply() {
-
+        mySettingsComponent.dialogPanel.apply()
     }
 
-    override fun disposeUIResources() {
-        mySettingsComponent = null
+    override fun reset() {
+        mySettingsComponent.dialogPanel.reset()
     }
 }
 
@@ -53,6 +54,7 @@ class AppSettingsComponent {
     val myMainPanel: JPanel
     val textField: LxLanguageTextField
     val colorSelect: ColorPanel
+    val dialogPanel: DialogPanel
 
     init {
         val openProjects = ProjectManager.getInstance().openProjects
@@ -68,39 +70,16 @@ class AppSettingsComponent {
 
         myMainPanel = JPanel(BorderLayout())
 
+        val config = LxApplicationSettings.instance
+
         val leftPanel = panel {
             row("Structs:") { cell(colorSelect) }
-            row { label("Label 2") }
-            row { label("Label 3") }
-            row { label("Label 3") }
-            row { label("Label 3") }
-            row { label("Label 3") }
-            row { label("Label 3") }
-            row { label("Label 3") }
-            row { label("Label 3") }
-            row { label("Label 3") }
-            row { label("Label 3") }
-            row { label("Label 3") }
-            row { label("Label 3") }
-            row { label("Label 3") }
-            row { label("Label 3") }
-            row { label("Label 3") }
-            row { label("Label 3") }
-            row { label("Label 3") }
-            row { label("Label 3") }
-            row { label("Label 3") }
-            row { label("Label 3") }
-            row { label("Label 3") }
-            row { label("Label 3") }
-            row { label("Label 3") }
-            row { label("Label 3") }
-            row { label("Label 3") }
-            row { label("Label 3") }
-            row { label("Label 3") }
-            row { label("Label 3") }
+            row("Test:") { textField().bindText(config::stringValue) }
         }
 
         leftPanel.border = JBUI.Borders.empty(10)
+
+        dialogPanel = leftPanel
 
         val scrollPanel = JBScrollPane(leftPanel)
         scrollPanel.border = JBUI.Borders.empty()
@@ -112,6 +91,10 @@ class AppSettingsComponent {
     }
 
     fun getPanel(): JComponent = myMainPanel
+
+//    companion object {
+//        private val config = LxApplicationSettings.INSTANCE
+//    }
 
     fun getPreviewText(): String = """
             trait Terrible {

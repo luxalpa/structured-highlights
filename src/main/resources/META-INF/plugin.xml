@@ -12,8 +12,10 @@
     <extensions defaultExtensionNs="com.intellij">
         <!--        <postStartupActivity implementation="com.luxalpa.structuredhighlights.startup.MyProjectActivity"/>-->
         <applicationConfigurable instance="com.luxalpa.structuredhighlights.LxConfigurable"
-                                 displayName="Structured Highlights"
+                                 key="pluginName"
+                                 bundle="messages.MyBundle"
                                  parentId="reference.settingsdialog.IDE.editor.colors"
+                                 id="com.luxalpa.structuredhighlights.LxConfigurable"
         />
         <highlightingPassFactory implementation="com.luxalpa.structuredhighlights.LxHighlightingPassFactory"/>
     </extensions>
