@@ -17,9 +17,9 @@ import java.awt.Color
     storages = [Storage("LxApplicationSettings.xml")]
 )
 class LxApplicationSettings :
-    SerializablePersistentStateComponent<LxApplicationSettings.AppState>(AppState()) {
+    SerializablePersistentStateComponent<LxApplicationSettings.AppState>(AppState()), AppSettings {
 
-    fun getColor(blockType: BlockType): Color = state.colors[blockType]?.c ?: blockType.defaultColor()
+    override fun getColor(blockType: BlockType): Color = state.colors[blockType]?.c ?: blockType.defaultColor()
     fun setColor(blockType: BlockType, color: Color) {
         updateState {
             it.copy(colors = it.colors + (blockType to SerializedColor(color)))

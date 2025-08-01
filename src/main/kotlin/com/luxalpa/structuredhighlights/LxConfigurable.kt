@@ -169,9 +169,15 @@ fun createRow(panel: Panel, previewSettings: PreviewSettings, blockType: BlockTy
     }
 }
 
-data class PreviewSettings(
-    var colors: MutableMap<BlockType, Color>
-)
+interface AppSettings {
+    fun getColor(blockType: BlockType): Color
+}
+
+class PreviewSettings(val colors: MutableMap<BlockType, Color>) : AppSettings {
+    override fun getColor(blockType: BlockType): Color {
+        return colors[blockType] ?: blockType.defaultColor()
+    }
+}
 
 class LxLanguageTextField(project: Project, text: String, val previewSettings: PreviewSettings) :
     LanguageTextField(Language.findLanguageByID("Rust")!!, project, text, false) {

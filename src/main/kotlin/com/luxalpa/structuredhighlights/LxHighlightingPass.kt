@@ -2,7 +2,6 @@ package com.luxalpa.structuredhighlights
 
 import com.intellij.codeHighlighting.*
 import com.intellij.codeHighlighting.TextEditorHighlightingPassRegistrar.Anchor
-import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.markup.*
 import com.intellij.openapi.progress.ProgressIndicator
@@ -127,7 +126,7 @@ class LxHighlightingPass(
         val markupModel = editor.markupModel
         val newHighlighters = mutableListOf<RangeHighlighter>()
 
-        val previewSettings = editor.getUserData(LUX_PREVIEW_SETTINGS)
+        val settings = editor.getUserData(LUX_PREVIEW_SETTINGS) ?: LxApplicationSettings.instance
 
         for (descriptor in descriptors) {
             val highlighter = if (descriptor.mode == Mode.EXACT_RANGE) {
@@ -155,7 +154,7 @@ class LxHighlightingPass(
                 )
 
                 highlighter.customRenderer = LxHighlightingRenderer(
-                    descriptor.blockType, descriptor.alpha, previewSettings
+                    descriptor.blockType, descriptor.alpha, settings
                 )
 
                 highlighter
@@ -169,7 +168,7 @@ class LxHighlightingPass(
     }
 }
 
-class LxHighlightingRenderer(val blockType: BlockType, val alpha: Float, val previewSettings: PreviewSettings?) :
+class LxHighlightingRenderer(val blockType: BlockType, val alpha: Float, val settings: AppSettings) :
     CustomHighlighterRenderer {
     override fun paint(editor: Editor, highlighter: RangeHighlighter, g: java.awt.Graphics) {
         val startLine = editor.offsetToVisualLine(highlighter.startOffset, true)
@@ -180,10 +179,10 @@ class LxHighlightingRenderer(val blockType: BlockType, val alpha: Float, val pre
         val height = endPosY - startPosY
         val width = editor.contentComponent.width
 
-        val baseColor = previewSettings?.colors[blockType] ?: blockType.defaultColor()
-        val customColor = Color(baseColor.red / 255f, baseColor.green / 255f, baseColor.blue / 255f, alpha)
+        val baseColor = settings.getColor(blockType)
+        val colorWithAlpha = Color(baseColor.red / 255f, baseColor.green / 255f, baseColor.blue / 255f, alpha)
 
-        g.color = customColor
+        g.color = colorWithAlpha
         g.fillRect(0, startPosY, width, height)
     }
 }
