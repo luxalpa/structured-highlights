@@ -69,15 +69,20 @@ class AppSettingsComponent {
         val project = if (openProjects.isNotEmpty()) openProjects[0] else ProjectManager.getInstance().defaultProject
 
         val previewSettings =
-            PreviewSettings(LxApplicationSettings.instance.state.colors.mapValues { it.value.c }.toMutableMap())
+            PreviewSettings(
+                LxApplicationSettings.instance.state.colors.mapValues { it.value.c }.toMutableMap(),
+                LxApplicationSettings.instance.state.highlightColors.mapValues { it.value.c }.toMutableMap()
+            )
 
         textField = LxLanguageTextField(project, getPreviewText(), previewSettings)
 
         myMainPanel = JPanel(BorderLayout())
 
         val leftPanel = panel {
-            BlockType.entries.forEach { blockType ->
-                createRow(this, previewSettings, blockType, textField)
+            group("Colors") {
+                BlockType.entries.forEach { blockType ->
+                    createRow(this, previewSettings, blockType)
+                }
             }
         }
 
@@ -148,9 +153,10 @@ class AppSettingsComponent {
         """.trimIndent()
 }
 
-fun createRow(panel: Panel, previewSettings: PreviewSettings, blockType: BlockType, textField: LxLanguageTextField) {
+fun createRow(panel: Panel, previewSettings: PreviewSettings, blockType: BlockType) {
     panel.row("${blockType.label()}:") {
         val colorSelect = ColorPanel()
+        val highlightColorSelect = ColorPanel()
 
         colorSelect.addActionListener { event ->
             colorSelect.selectedColor?.let { color ->
@@ -166,16 +172,40 @@ fun createRow(panel: Panel, previewSettings: PreviewSettings, blockType: BlockTy
                 { value -> LxApplicationSettings.instance.setColor(blockType, value) },
             ),
         )
+
+        highlightColorSelect.addActionListener { event ->
+            highlightColorSelect.selectedColor?.let { color ->
+                previewSettings.highlightColors[blockType] = color
+            }
+        }
+
+        cell(highlightColorSelect).bind(
+            componentGet = { comp -> comp.selectedColor ?: blockType.defaultHighlightColor() },
+            componentSet = { comp, value -> comp.selectedColor = value },
+            prop = MutableProperty(
+                { LxApplicationSettings.instance.getHighlightColor(blockType) },
+                { value -> LxApplicationSettings.instance.setHighlightColor(blockType, value) },
+            ),
+        )
     }
 }
 
 interface AppSettings {
     fun getColor(blockType: BlockType): Color
+    fun getHighlightColor(blockType: BlockType): Color = getColor(blockType)
 }
 
-class PreviewSettings(val colors: MutableMap<BlockType, Color>) : AppSettings {
+class PreviewSettings(
+    val colors: MutableMap<BlockType, Color>,
+    val highlightColors: MutableMap<BlockType, Color>
+) :
+    AppSettings {
     override fun getColor(blockType: BlockType): Color {
         return colors[blockType] ?: blockType.defaultColor()
+    }
+
+    override fun getHighlightColor(blockType: BlockType): Color {
+        return highlightColors[blockType] ?: blockType.defaultHighlightColor()
     }
 }
 

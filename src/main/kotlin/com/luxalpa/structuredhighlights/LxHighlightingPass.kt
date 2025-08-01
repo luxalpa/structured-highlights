@@ -14,9 +14,6 @@ import org.rust.lang.core.psi.RsFile
 import java.awt.Color
 import java.awt.Font
 
-const val COLOR_STRENGTH: Float = 0.6f
-const val COLOR_MIDDLE: Float = 0.4f
-const val COLOR_BASE: Float = 0.1f
 const val COLOR_ALPHA: Float = 0.035f
 const val HEADING_ALPHA: Float = 0.1f
 const val SUBHEADING_ALPHA: Float = 0.06f
@@ -30,21 +27,21 @@ enum class BlockType {
     MODULE;
 
     fun defaultColor(): Color = when (this) {
-        ENUM -> Color(COLOR_STRENGTH, COLOR_BASE, COLOR_STRENGTH)
-        STRUCT -> Color(COLOR_BASE, COLOR_BASE, COLOR_STRENGTH)
-        TRAIT -> Color(COLOR_BASE, COLOR_STRENGTH, COLOR_BASE)
-        IMPL -> Color(0.6f, 0.4f, 0.1f)
-        FUNCTION -> Color(COLOR_STRENGTH, COLOR_BASE, COLOR_BASE)
-        MODULE -> Color(COLOR_MIDDLE, COLOR_MIDDLE, COLOR_MIDDLE)
+        ENUM -> Color(-1083409)
+        STRUCT -> Color(-15329590)
+        TRAIT -> Color(-16521928)
+        IMPL -> Color(-6724070)
+        FUNCTION -> Color(-6743526)
+        MODULE -> Color(-10066330)
     }
 
-    fun toHeadingBackgroundColor(): Color = when (this) {
-        ENUM -> Color(COLOR_STRENGTH, COLOR_BASE, COLOR_STRENGTH)
-        STRUCT -> Color(COLOR_BASE, COLOR_BASE, COLOR_STRENGTH)
-        TRAIT -> Color(COLOR_BASE, COLOR_STRENGTH, COLOR_BASE)
-        IMPL -> Color(0.95f, 0.92f, 0.9f)
-        FUNCTION -> Color(0.6f, 0.2f, 0.2f)
-        MODULE -> Color(COLOR_MIDDLE, COLOR_MIDDLE, COLOR_MIDDLE)
+    fun defaultHighlightColor(): Color = when (this) {
+        ENUM -> Color(-593418)
+        STRUCT -> Color(-921096)
+        TRAIT -> Color(-1181971)
+        IMPL -> Color(-922131)
+        FUNCTION -> Color(-462094)
+        MODULE -> Color(-1381654)
     }
 
     fun label(): String {
@@ -135,8 +132,10 @@ class LxHighlightingPass(
                     descriptor.endOffset,
                     HighlighterLayer.GUARDED_BLOCKS + 1,
                     TextAttributes(
-                        Color(0.0f, 0.0f, 0.0f),
-                        Color(0.96f, 0.95f, 0.93f),
+                        null,
+//                        Color(0.0f, 0.0f, 0.0f),
+                        settings.getHighlightColor(descriptor.blockType),
+//                        Color(0.96f, 0.95f, 0.93f),
                         null,
                         null,
                         Font.PLAIN

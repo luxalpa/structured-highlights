@@ -3,11 +3,10 @@ package com.luxalpa.structuredhighlights
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.SerializablePersistentStateComponent
 import com.intellij.openapi.components.Service
-import com.intellij.openapi.components.Storage
 import com.intellij.openapi.components.State
+import com.intellij.openapi.components.Storage
 import com.intellij.util.xmlb.Converter
 import com.intellij.util.xmlb.annotations.Attribute
-import com.intellij.util.xmlb.annotations.OptionTag
 import com.intellij.util.xmlb.annotations.Tag
 import java.awt.Color
 
@@ -26,8 +25,23 @@ class LxApplicationSettings :
         }
     }
 
+    override fun getHighlightColor(blockType: BlockType): Color =
+        state.highlightColors[blockType]?.c ?: blockType.defaultHighlightColor()
+
+    fun setHighlightColor(blockType: BlockType, color: Color) {
+        updateState {
+            it.copy(highlightColors = it.highlightColors + (blockType to SerializedColor(color)))
+        }
+    }
+
     data class AppState(
-        @JvmField var colors: Map<BlockType, SerializedColor> = BlockType.entries.associateWith { SerializedColor(it.defaultColor()) }
+        @JvmField var colors: Map<BlockType, SerializedColor> = BlockType.entries.associateWith {
+            SerializedColor(it.defaultColor())
+        },
+
+        @JvmField var highlightColors: Map<BlockType, SerializedColor> = BlockType.entries.associateWith {
+            SerializedColor(it.defaultHighlightColor())
+        }
     )
 
     @Tag("color")
