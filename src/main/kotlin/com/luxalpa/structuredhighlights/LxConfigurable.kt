@@ -1,6 +1,8 @@
 package com.luxalpa.structuredhighlights
 
+import com.github.weisj.jsvg.cs
 import com.intellij.lang.Language
+import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.editor.colors.EditorFontType
 import com.intellij.openapi.editor.ex.EditorEx
 import com.intellij.openapi.options.Configurable
@@ -9,12 +11,19 @@ import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.ui.DialogPanel
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.util.NlsContexts
+import com.intellij.platform.eel.provider.utils.copy
 import com.intellij.ui.ColorPanel
 import com.intellij.ui.JBColor
 import com.intellij.ui.LanguageTextField
 import com.intellij.ui.components.JBScrollPane
+import com.intellij.ui.components.JBTextField
+import com.intellij.ui.dsl.builder.MutableProperty
+import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.bindText
 import com.intellij.ui.dsl.builder.panel
+import com.intellij.ui.dsl.builder.text
+import com.intellij.ui.dsl.builder.toMutableProperty
+import com.intellij.ui.dsl.builder.toNullableProperty
 import com.intellij.util.ui.JBUI
 import java.awt.BorderLayout
 import java.awt.Color
@@ -48,33 +57,28 @@ class LxConfigurable : Configurable, Configurable.NoScroll, Configurable.NoMargi
     }
 }
 
-val LUX_PREVIEW_COLOR: Key<Color> = Key.create("LUX_PREVIEW_COLOR")
+val LUX_PREVIEW_SETTINGS: Key<PreviewSettings> = Key.create("LUX_PREVIEW_SETTINGS")
 
 class AppSettingsComponent {
     val myMainPanel: JPanel
     val textField: LxLanguageTextField
-    val colorSelect: ColorPanel
     val dialogPanel: DialogPanel
 
     init {
         val openProjects = ProjectManager.getInstance().openProjects
         val project = if (openProjects.isNotEmpty()) openProjects[0] else ProjectManager.getInstance().defaultProject
 
-        textField = LxLanguageTextField(project, getPreviewText())
-        colorSelect = ColorPanel()
+        val previewSettings =
+            PreviewSettings(LxApplicationSettings.instance.state.colors.mapValues { it.value.c }.toMutableMap())
 
-        colorSelect.addActionListener { event ->
-            val color = colorSelect.selectedColor
-            textField.editor?.putUserData(LUX_PREVIEW_COLOR, color)
-        }
+        textField = LxLanguageTextField(project, getPreviewText(), previewSettings)
 
         myMainPanel = JPanel(BorderLayout())
 
-        val config = LxApplicationSettings.instance
-
         val leftPanel = panel {
-            row("Structs:") { cell(colorSelect) }
-            row("Test:") { textField().bindText(config::stringValue) }
+            BlockType.entries.forEach { blockType ->
+                createRow(this, previewSettings, blockType, textField)
+            }
         }
 
         leftPanel.border = JBUI.Borders.empty(10)
@@ -83,7 +87,6 @@ class AppSettingsComponent {
 
         val scrollPanel = JBScrollPane(leftPanel)
         scrollPanel.border = JBUI.Borders.empty()
-        textField.editor?.setBorder(JBUI.Borders.empty())
 
         myMainPanel.border = JBUI.Borders.customLine(JBColor.border(), 1, 0, 0, 0)
         myMainPanel.add(scrollPanel, BorderLayout.WEST)
@@ -91,10 +94,6 @@ class AppSettingsComponent {
     }
 
     fun getPanel(): JComponent = myMainPanel
-
-//    companion object {
-//        private val config = LxApplicationSettings.INSTANCE
-//    }
 
     fun getPreviewText(): String = """
             trait Terrible {
@@ -149,7 +148,32 @@ class AppSettingsComponent {
         """.trimIndent()
 }
 
-class LxLanguageTextField(project: Project, text: String) :
+fun createRow(panel: Panel, previewSettings: PreviewSettings, blockType: BlockType, textField: LxLanguageTextField) {
+    panel.row("${blockType.label()}:") {
+        val colorSelect = ColorPanel()
+
+        colorSelect.addActionListener { event ->
+            colorSelect.selectedColor?.let { color ->
+                previewSettings.colors[blockType] = color
+            }
+        }
+
+        cell(colorSelect).bind(
+            componentGet = { comp -> comp.selectedColor ?: blockType.defaultColor() },
+            componentSet = { comp, value -> comp.selectedColor = value },
+            prop = MutableProperty(
+                { LxApplicationSettings.instance.getColor(blockType) },
+                { value -> LxApplicationSettings.instance.setColor(blockType, value) },
+            ),
+        )
+    }
+}
+
+data class PreviewSettings(
+    var colors: MutableMap<BlockType, Color>
+)
+
+class LxLanguageTextField(project: Project, text: String, val previewSettings: PreviewSettings) :
     LanguageTextField(Language.findLanguageByID("Rust")!!, project, text, false) {
 
     init {
@@ -168,6 +192,7 @@ class LxLanguageTextField(project: Project, text: String) :
         editor.settings.isCaretRowShown = true
         editor.isOneLineMode = false
         editor.setBorder(JBUI.Borders.customLine(JBColor.border(), 0, 1, 0, 1))
+        editor.putUserData(LUX_PREVIEW_SETTINGS, previewSettings)
         return editor
     }
 }

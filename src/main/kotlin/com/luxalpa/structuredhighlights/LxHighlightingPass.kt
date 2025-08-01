@@ -2,6 +2,7 @@ package com.luxalpa.structuredhighlights
 
 import com.intellij.codeHighlighting.*
 import com.intellij.codeHighlighting.TextEditorHighlightingPassRegistrar.Anchor
+import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.markup.*
 import com.intellij.openapi.progress.ProgressIndicator
@@ -29,7 +30,7 @@ enum class BlockType {
     FUNCTION,
     MODULE;
 
-    fun toColor(): Color = when (this) {
+    fun defaultColor(): Color = when (this) {
         ENUM -> Color(COLOR_STRENGTH, COLOR_BASE, COLOR_STRENGTH)
         STRUCT -> Color(COLOR_BASE, COLOR_BASE, COLOR_STRENGTH)
         TRAIT -> Color(COLOR_BASE, COLOR_STRENGTH, COLOR_BASE)
@@ -45,6 +46,17 @@ enum class BlockType {
         IMPL -> Color(0.95f, 0.92f, 0.9f)
         FUNCTION -> Color(0.6f, 0.2f, 0.2f)
         MODULE -> Color(COLOR_MIDDLE, COLOR_MIDDLE, COLOR_MIDDLE)
+    }
+
+    fun label(): String {
+        return when (this) {
+            ENUM -> "Enum"
+            STRUCT -> "Struct"
+            TRAIT -> "Trait"
+            IMPL -> "Impl"
+            FUNCTION -> "Function"
+            MODULE -> "Module"
+        }
     }
 }
 
@@ -115,6 +127,8 @@ class LxHighlightingPass(
         val markupModel = editor.markupModel
         val newHighlighters = mutableListOf<RangeHighlighter>()
 
+        val previewSettings = editor.getUserData(LUX_PREVIEW_SETTINGS)
+
         for (descriptor in descriptors) {
             val highlighter = if (descriptor.mode == Mode.EXACT_RANGE) {
                 markupModel.addRangeHighlighter(
@@ -140,10 +154,8 @@ class LxHighlightingPass(
                     HighlighterTargetArea.LINES_IN_RANGE
                 )
 
-                val colorOverride = editor.getUserData(LUX_PREVIEW_COLOR)
-
                 highlighter.customRenderer = LxHighlightingRenderer(
-                    descriptor.blockType, descriptor.alpha, colorOverride
+                    descriptor.blockType, descriptor.alpha, previewSettings
                 )
 
                 highlighter
@@ -157,7 +169,7 @@ class LxHighlightingPass(
     }
 }
 
-class LxHighlightingRenderer(val blockType: BlockType, val alpha: Float, val colorOverride: Color?) :
+class LxHighlightingRenderer(val blockType: BlockType, val alpha: Float, val previewSettings: PreviewSettings?) :
     CustomHighlighterRenderer {
     override fun paint(editor: Editor, highlighter: RangeHighlighter, g: java.awt.Graphics) {
         val startLine = editor.offsetToVisualLine(highlighter.startOffset, true)
@@ -168,7 +180,7 @@ class LxHighlightingRenderer(val blockType: BlockType, val alpha: Float, val col
         val height = endPosY - startPosY
         val width = editor.contentComponent.width
 
-        val baseColor = colorOverride ?: blockType.toColor()
+        val baseColor = previewSettings?.colors[blockType] ?: blockType.defaultColor()
         val customColor = Color(baseColor.red / 255f, baseColor.green / 255f, baseColor.blue / 255f, alpha)
 
         g.color = customColor
