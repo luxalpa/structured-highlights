@@ -1,8 +1,6 @@
 package com.luxalpa.structuredhighlights
 
-import com.github.weisj.jsvg.cs
 import com.intellij.lang.Language
-import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.editor.colors.EditorFontType
 import com.intellij.openapi.editor.ex.EditorEx
 import com.intellij.openapi.options.Configurable
@@ -11,19 +9,15 @@ import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.ui.DialogPanel
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.util.NlsContexts
-import com.intellij.platform.eel.provider.utils.copy
 import com.intellij.ui.ColorPanel
 import com.intellij.ui.JBColor
 import com.intellij.ui.LanguageTextField
 import com.intellij.ui.components.JBScrollPane
-import com.intellij.ui.components.JBTextField
 import com.intellij.ui.dsl.builder.MutableProperty
 import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.bindText
+import com.intellij.ui.dsl.builder.bindValue
 import com.intellij.ui.dsl.builder.panel
-import com.intellij.ui.dsl.builder.text
-import com.intellij.ui.dsl.builder.toMutableProperty
-import com.intellij.ui.dsl.builder.toNullableProperty
 import com.intellij.util.ui.JBUI
 import java.awt.BorderLayout
 import java.awt.Color
@@ -71,7 +65,10 @@ class AppSettingsComponent {
         val previewSettings =
             PreviewSettings(
                 LxApplicationSettings.instance.state.colors.mapValues { it.value.c }.toMutableMap(),
-                LxApplicationSettings.instance.state.highlightColors.mapValues { it.value.c }.toMutableMap()
+                LxApplicationSettings.instance.state.highlightColors.mapValues { it.value.c }.toMutableMap(),
+                LxApplicationSettings.instance.state.opacityNormal,
+                LxApplicationSettings.instance.state.opacityHeader,
+                LxApplicationSettings.instance.state.opacitySubheader,
             )
 
         textField = LxLanguageTextField(project, getPreviewText(), previewSettings)
@@ -82,6 +79,38 @@ class AppSettingsComponent {
             group("Colors") {
                 BlockType.entries.forEach { blockType ->
                     createRow(this, previewSettings, blockType)
+                }
+            }
+            group("Opacity") {
+                row("Normal:") {
+                    spinner(0.0..1.0, 0.005).bindValue(
+                        LxApplicationSettings.instance::opacityNormal
+                    ).applyToComponent {
+                        addChangeListener {
+                            previewSettings.opacityNormal = value as Double
+                            textField.editor?.component?.repaint()
+                        }
+                    }
+                }
+                row("Header:") {
+                    spinner(0.0..1.0, 0.005).bindValue(
+                        LxApplicationSettings.instance::opacityHeader
+                    ).applyToComponent {
+                        addChangeListener {
+                            previewSettings.opacityHeader = value as Double
+                            textField.editor?.component?.repaint()
+                        }
+                    }
+                }
+                row("Subheader:") {
+                    spinner(0.0..1.0, 0.005).bindValue(
+                        LxApplicationSettings.instance::opacitySubheader
+                    ).applyToComponent {
+                        addChangeListener {
+                            previewSettings.opacitySubheader = value as Double
+                            textField.editor?.component?.repaint()
+                        }
+                    }
                 }
             }
         }
@@ -123,6 +152,7 @@ class AppSettingsComponent {
                     println!("Breathing fire!");
                     self.roar();
                 }
+                
                 fn devour(&self, num_people: usize) {
                     println!("Devouring {} snacks", num_people);
                     self.roar();
@@ -193,11 +223,15 @@ fun createRow(panel: Panel, previewSettings: PreviewSettings, blockType: BlockTy
 interface AppSettings {
     fun getColor(blockType: BlockType): Color
     fun getHighlightColor(blockType: BlockType): Color = getColor(blockType)
+    fun getOpacity(kind: Kind): Double
 }
 
 class PreviewSettings(
     val colors: MutableMap<BlockType, Color>,
-    val highlightColors: MutableMap<BlockType, Color>
+    val highlightColors: MutableMap<BlockType, Color>,
+    var opacityNormal: Double,
+    var opacityHeader: Double,
+    var opacitySubheader: Double,
 ) :
     AppSettings {
     override fun getColor(blockType: BlockType): Color {
@@ -206,6 +240,14 @@ class PreviewSettings(
 
     override fun getHighlightColor(blockType: BlockType): Color {
         return highlightColors[blockType] ?: blockType.defaultHighlightColor()
+    }
+
+    override fun getOpacity(kind: Kind): Double {
+        return when (kind) {
+            Kind.Block, Kind.Identifier -> opacityNormal
+            Kind.Header -> opacityHeader
+            Kind.Subheader -> opacitySubheader
+        }
     }
 }
 

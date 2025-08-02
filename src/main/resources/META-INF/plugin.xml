@@ -10,7 +10,6 @@
     <resource-bundle>messages.MyBundle</resource-bundle>
 
     <extensions defaultExtensionNs="com.intellij">
-        <!--        <postStartupActivity implementation="com.luxalpa.structuredhighlights.startup.MyProjectActivity"/>-->
         <applicationConfigurable instance="com.luxalpa.structuredhighlights.LxConfigurable"
                                  key="pluginName"
                                  bundle="messages.MyBundle"

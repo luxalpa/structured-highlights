@@ -34,6 +34,39 @@ class LxApplicationSettings :
         }
     }
 
+    var opacityNormal: Double
+        get() = state.opacityNormal
+        set(value) {
+            updateState {
+                it.copy(opacityNormal = value)
+            }
+        }
+
+    var opacityHeader: Double
+        get() = state.opacityHeader
+        set(value) {
+            updateState {
+                it.copy(opacityHeader = value)
+            }
+        }
+
+    var opacitySubheader: Double
+        get() = state.opacitySubheader
+        set(value) {
+            updateState {
+                it.copy(opacitySubheader = value)
+            }
+        }
+
+    override fun getOpacity(kind: Kind): Double {
+        return when (kind) {
+            Kind.Block -> state.opacityNormal
+            Kind.Header -> state.opacityHeader
+            Kind.Subheader -> state.opacitySubheader
+            Kind.Identifier -> state.opacityNormal
+        }
+    }
+
     data class AppState(
         @JvmField var colors: Map<BlockType, SerializedColor> = BlockType.entries.associateWith {
             SerializedColor(it.defaultColor())
@@ -41,7 +74,11 @@ class LxApplicationSettings :
 
         @JvmField var highlightColors: Map<BlockType, SerializedColor> = BlockType.entries.associateWith {
             SerializedColor(it.defaultHighlightColor())
-        }
+        },
+
+        @JvmField var opacityNormal: Double = 0.035,
+        @JvmField var opacityHeader: Double = 0.1,
+        @JvmField var opacitySubheader: Double = 0.06
     )
 
     @Tag("color")

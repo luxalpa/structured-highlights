@@ -14,9 +14,9 @@ import org.rust.lang.core.psi.RsFile
 import java.awt.Color
 import java.awt.Font
 
-const val COLOR_ALPHA: Float = 0.035f
-const val HEADING_ALPHA: Float = 0.1f
-const val SUBHEADING_ALPHA: Float = 0.06f
+const val COLOR_ALPHA: Double = 0.035
+const val HEADING_ALPHA: Double = 0.1
+const val SUBHEADING_ALPHA: Double = 0.06
 
 enum class BlockType {
     ENUM,
@@ -66,7 +66,7 @@ data class DefinitionBlockDescriptor(
     val endOffset: Int,
     val blockType: BlockType,
     val actualType: BlockType,
-    val alpha: Float = COLOR_ALPHA,
+    val kind: Kind = Kind.Block,
     val mode: Mode = Mode.FULL_LINE
 )
 
@@ -133,9 +133,7 @@ class LxHighlightingPass(
                     HighlighterLayer.GUARDED_BLOCKS + 1,
                     TextAttributes(
                         null,
-//                        Color(0.0f, 0.0f, 0.0f),
                         settings.getHighlightColor(descriptor.blockType),
-//                        Color(0.96f, 0.95f, 0.93f),
                         null,
                         null,
                         Font.PLAIN
@@ -153,7 +151,7 @@ class LxHighlightingPass(
                 )
 
                 highlighter.customRenderer = LxHighlightingRenderer(
-                    descriptor.blockType, descriptor.alpha, settings
+                    descriptor.blockType, descriptor.kind, settings
                 )
 
                 highlighter
@@ -167,7 +165,7 @@ class LxHighlightingPass(
     }
 }
 
-class LxHighlightingRenderer(val blockType: BlockType, val alpha: Float, val settings: AppSettings) :
+class LxHighlightingRenderer(val blockType: BlockType, val kind: Kind, val settings: AppSettings) :
     CustomHighlighterRenderer {
     override fun paint(editor: Editor, highlighter: RangeHighlighter, g: java.awt.Graphics) {
         val startLine = editor.offsetToVisualLine(highlighter.startOffset, true)
@@ -179,7 +177,12 @@ class LxHighlightingRenderer(val blockType: BlockType, val alpha: Float, val set
         val width = editor.contentComponent.width
 
         val baseColor = settings.getColor(blockType)
-        val colorWithAlpha = Color(baseColor.red / 255f, baseColor.green / 255f, baseColor.blue / 255f, alpha)
+        val alpha = settings.getOpacity(kind)
+
+        val colorWithAlpha = Color(
+            baseColor.red / 255f, baseColor.green / 255f, baseColor.blue / 255f,
+            alpha.toFloat()
+        )
 
         g.color = colorWithAlpha
         g.fillRect(0, startPosY, width, height)

@@ -29,12 +29,6 @@ class RustVisitor : RsRecursiveVisitor() {
         }
 
         for (descriptor in descriptors) {
-            val alpha = when (descriptor.kind) {
-                Kind.Block -> COLOR_ALPHA
-                Kind.Header, Kind.Identifier -> HEADING_ALPHA
-                Kind.Subheader -> SUBHEADING_ALPHA
-            }
-
             val mode = when (descriptor.kind) {
                 Kind.Block, Kind.Header, Kind.Subheader -> Mode.FULL_LINE
                 Kind.Identifier -> Mode.EXACT_RANGE
@@ -45,7 +39,7 @@ class RustVisitor : RsRecursiveVisitor() {
                 descriptor.element.endOffset,
                 newBlockType,
                 defaultType,
-                alpha,
+                descriptor.kind,
                 mode
             )
         }
