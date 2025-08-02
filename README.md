@@ -25,12 +25,12 @@
   about releases containing new features and fixes.
 
 <!-- Plugin description -->
-This Fancy IntelliJ Platform Plugin is going to be your implementation of the brilliant ideas that you have.
+Highlight entire blocks of code in different colors!
 
-This specific section is a source for the [plugin.xml](/src/main/resources/META-INF/plugin.xml) file which will be
-extracted by the [Gradle](/build.gradle.kts) during the build process.
+- The initial version only supports Rust, more languages will come when I can find the time.
+- Colors and opacity values are configurable under <kbd>Editor</kbd> → <kbd>Color Scheme</kbd> → <kbd>Structured
+  Highlights</kbd> (it's at the very bottom)
 
-To keep everything working, do not remove `<!-- ... -->` sections.
 <!-- Plugin description end -->
 
 ## Installation
