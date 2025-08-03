@@ -2,6 +2,8 @@
 
 # Structured Highlights Changelog
 
+## [Unreleased]
+
 ## 0.0.1
 
 Initial release with:
