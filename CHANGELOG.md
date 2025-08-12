@@ -4,6 +4,10 @@
 
 ## [Unreleased]
 
+## 0.0.2
+
+- Removed inner block highlighting as it was causing severe performance issues.
+
 ## 0.0.1
 
 Initial release with:
