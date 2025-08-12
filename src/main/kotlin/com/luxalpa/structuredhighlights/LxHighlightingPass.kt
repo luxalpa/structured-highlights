@@ -2,6 +2,7 @@ package com.luxalpa.structuredhighlights
 
 import com.intellij.codeHighlighting.*
 import com.intellij.codeHighlighting.TextEditorHighlightingPassRegistrar.Anchor
+import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.markup.*
 import com.intellij.openapi.progress.ProgressIndicator
@@ -77,7 +78,7 @@ enum class Kind {
 data class Descriptor(val kind: Kind, val element: PsiElement)
 
 private val LX_DESCRIPTORS: Key<List<DefinitionBlockDescriptor>> = Key.create("LX_DESCRIPTORS")
-private val LX_HIGHLIGHTERS: Key<List<RangeHighlighter>> = Key.create("LX_HIGHLIGHTERS")
+private val LX_HIGHLIGHTERS: Key<MutableList<RangeHighlighter>> = Key.create("LX_HIGHLIGHTERS")
 
 class LxHighlightingPassFactory : TextEditorHighlightingPassFactoryRegistrar, TextEditorHighlightingPassFactory,
     DumbAware {
@@ -117,7 +118,10 @@ class LxHighlightingPass(
         val descriptors = editor.getUserData(LX_DESCRIPTORS) ?: return
 
         // Remove old highlighters.
-        editor.getUserData(LX_HIGHLIGHTERS)?.forEach { it.dispose() }
+        val oldHighlighters = editor.getUserData(LX_HIGHLIGHTERS)
+        oldHighlighters?.forEach { it.dispose() }
+        oldHighlighters?.clear()
+
         editor.putUserData(LX_HIGHLIGHTERS, null)
 
         val markupModel = editor.markupModel
