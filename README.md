@@ -31,6 +31,10 @@ Highlight entire blocks of code in different colors!
 - Colors and opacity values are configurable under <kbd>Editor</kbd> → <kbd>Color Scheme</kbd> → <kbd>Structured
   Highlights</kbd> (it's at the very bottom)
 
+Don't hesitate to open an issue on GitHub if there's anything you'd like to see added (including other languages).
+Note for dark mode, you need to go into the settings and adjust the colors a bit as it doesn't yet contain a preset for
+that.
+
 <!-- Plugin description end -->
 
 ## Installation
