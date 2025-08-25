@@ -137,7 +137,8 @@ class LxHighlightingPass(
                     HighlighterLayer.GUARDED_BLOCKS + 1,
                     TextAttributes(
                         null,
-                        settings.getHighlightColor(descriptor.blockType),
+                        null,
+//                        settings.getHighlightColor(descriptor.blockType),
                         null,
                         null,
                         Font.PLAIN
@@ -180,7 +181,7 @@ class LxHighlightingRenderer(val blockType: BlockType, val kind: Kind, val setti
         val height = endPosY - startPosY
         val width = editor.contentComponent.width
 
-        val baseColor = settings.getColor(blockType)
+        val baseColor = editor.colorsScheme.getColor(COLOR_KEYS.getValue(blockType)) ?: blockType.defaultColor()
         val alpha = settings.getOpacity(kind)
 
         val colorWithAlpha = Color(

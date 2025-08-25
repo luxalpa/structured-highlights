@@ -10,12 +10,15 @@
     <resource-bundle>messages.MyBundle</resource-bundle>
 
     <extensions defaultExtensionNs="com.intellij">
-        <applicationConfigurable instance="com.luxalpa.structuredhighlights.LxConfigurable"
-                                 key="pluginName"
-                                 bundle="messages.MyBundle"
-                                 parentId="reference.settingsdialog.IDE.editor.colors"
-                                 id="com.luxalpa.structuredhighlights.LxConfigurable"
-        />
+        <!--        <applicationConfigurable instance="com.luxalpa.structuredhighlights.LxConfigurable"-->
+        <!--                                 key="pluginName"-->
+        <!--                                 bundle="messages.MyBundle"-->
+        <!--                                 parentId="reference.settingsdialog.IDE.editor.colors"-->
+        <!--                                 id="com.luxalpa.structuredhighlights.LxConfigurable"-->
+        <!--        />-->
+        <colorAndFontPanelFactory implementation="com.luxalpa.structuredhighlights.LxColorsPageFactory"
+                                  id="com.luxalpa.structuredhighlights.LxColorsPageFactory"/>
         <highlightingPassFactory implementation="com.luxalpa.structuredhighlights.LxHighlightingPassFactory"/>
+        <colorAndFontDescriptorProvider implementation="com.luxalpa.structuredhighlights.LxColorsPageFactory"/>
     </extensions>
 </idea-plugin>
