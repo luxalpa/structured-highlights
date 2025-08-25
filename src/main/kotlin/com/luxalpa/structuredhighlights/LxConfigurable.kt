@@ -2,6 +2,7 @@ package com.luxalpa.structuredhighlights
 
 import com.intellij.application.options.colors.*
 import com.intellij.lang.Language
+import com.intellij.openapi.editor.colors.ColorKey
 import com.intellij.openapi.editor.colors.EditorColorsScheme
 import com.intellij.openapi.editor.colors.EditorFontType
 import com.intellij.openapi.editor.colors.EditorSchemeAttributeDescriptor
@@ -16,10 +17,14 @@ import com.intellij.openapi.util.NlsContexts
 import com.intellij.ui.ColorPanel
 import com.intellij.ui.JBColor
 import com.intellij.ui.LanguageTextField
+import com.intellij.ui.components.JBScrollPane
+import com.intellij.ui.dsl.builder.BottomGap
 import com.intellij.ui.dsl.builder.Panel
+import com.intellij.ui.dsl.builder.TopGap
 import com.intellij.ui.dsl.builder.panel
 import com.intellij.util.EventDispatcher
 import com.intellij.util.ui.JBUI
+import fleet.util.associateNotNull
 import java.awt.BorderLayout
 import javax.swing.JComponent
 import javax.swing.JPanel
@@ -59,14 +64,9 @@ class LxColorsPageFactory : ColorAndFontPanelFactory, ColorAndFontDescriptorsPro
     override fun getAttributeDescriptors(): Array<out AttributesDescriptor?> = emptyArray<AttributesDescriptor>()
 
     override fun getColorDescriptors(): Array<out ColorDescriptor?> {
-        return arrayOf(
-            ColorDescriptor(
-                "Trait color",
-                COLOR_KEYS.getValue(BlockType.TRAIT),
-                ColorDescriptor.Kind.BACKGROUND
-            )
-        )
-//        return COLOR_KEYS.values.map { ColorDescriptor(it.externalName, it.defaultColor, true) }.toTypedArray()
+        return COLOR_KEYS.entries
+            .map { ColorDescriptor(it.key.label(), it.value, ColorDescriptor.Kind.BACKGROUND) }
+            .toTypedArray()
     }
 
     override fun getDisplayName(): @NlsContexts.ConfigurableName String = MyBundle.message("pluginName")
@@ -74,19 +74,30 @@ class LxColorsPageFactory : ColorAndFontPanelFactory, ColorAndFontDescriptorsPro
 
 class LxOptionsPanel(val myOptions: ColorAndFontOptions, val mySchemesPanel: SchemesPanel) : OptionsPanel {
     val mainPanel: JPanel = JPanel(BorderLayout())
-    var myDescriptor: EditorSchemeAttributeDescriptor? = null
-    val myColorPanel: ColorPanel
+    var myDescriptors: Map<ColorKey, ColorAndFontDescription> = emptyMap()
+    val myColorPanels: Map<ColorKey, ColorPanel>
     val myCategoryName = MyBundle.message("pluginName")
 
     private val myDispatcher =
         EventDispatcher.create(ColorAndFontSettingsListener::class.java)
 
     init {
-        var theColorPanel: ColorPanel? = null
-        mainPanel.add(panel {
-            theColorPanel = createRow(this, BlockType.TRAIT, myOptions, myDispatcher)
-        })
-        myColorPanel = theColorPanel!!
+
+        var theColorPanels: Map<ColorKey, ColorPanel>? = null
+        val innerPanel = panel {
+            theColorPanels = BlockType.entries.associate { blockType ->
+                COLOR_KEYS.getValue(blockType) to createRow(this, blockType, myOptions, myDispatcher)
+            }
+        }
+
+        innerPanel.border = JBUI.Borders.empty(0, 10)
+
+        val scrollPanel = JBScrollPane(innerPanel)
+
+        myColorPanels = theColorPanels!!
+
+        mainPanel.add(scrollPanel, BorderLayout.CENTER)
+
         myOptions.addListener(object : ColorAndFontSettingsListener.Abstract() {
             override fun settingsChanged() {
                 if (!mySchemesPanel.areSchemesLoaded()) return
@@ -103,33 +114,29 @@ class LxOptionsPanel(val myOptions: ColorAndFontOptions, val mySchemesPanel: Sch
 
     /// Whenever the scheme changes, we need to fetch the ColorDescriptors again and then update the ColorPanel.
     override fun updateOptionsList() {
-        val descriptions = myOptions.currentDescriptions
+        myDescriptors = myOptions.currentDescriptions.asSequence()
             .filter { description -> description.group == myCategoryName }
-        if (descriptions.isEmpty()) {
-            myDescriptor = null
-            debug { "No descriptors found" }
-            return
-        }
-        myDescriptor = descriptions[0]
+            .mapNotNull { it as? ColorAndFontDescription }
+            .associateBy { description -> ColorKey.find(description.type) }
 
         processListValueChanged()
     }
 
     // When the scheme changes somehow, then we need to update the controls to match the data from the scheme.
     fun processListValueChanged() {
-        val descriptor = myDescriptor as? ColorAndFontDescription ?: return
-        myColorPanel.selectedColor = descriptor.backgroundColor
+        for (descriptor in myDescriptors) {
+            myColorPanels[descriptor.key]?.selectedColor = descriptor.value.backgroundColor
+        }
     }
 
-    override fun showOption(option: String?): Runnable? {
-        return null
-    }
+    override fun showOption(option: String?): Runnable? = null
 
 
     override fun applyChangesToScheme() {
-        val descriptor = myDescriptor as? ColorAndFontDescription ?: return
-        descriptor.backgroundColor = myColorPanel.selectedColor
-        descriptor.apply(myOptions.selectedScheme)
+        for (descriptor in myDescriptors) {
+            descriptor.value.backgroundColor = myColorPanels[descriptor.key]?.selectedColor
+            descriptor.value.apply(myOptions.selectedScheme)
+        }
     }
 
     override fun selectOption(typeToSelect: String?) {
@@ -159,8 +166,6 @@ fun createRow(
 
         colorSelect.addActionListener { event ->
             colorSelect.selectedColor?.let { color ->
-//                options.selectedScheme?.setColor(COLOR_KEYS.getValue(blockType), color)
-
                 // This will trigger NewColorAndFontPanel, which then runs `applyChangesToScheme` on the OptionsPanel,
                 // and then `updateView` on the PreviewPanel.
                 myDispatcher.multicaster.settingsChanged()
@@ -170,31 +175,14 @@ fun createRow(
 
         cell(colorSelect)
 
-//            .bind(
-//                componentGet = { comp -> comp.selectedColor ?: blockType.defaultColor() },
-//                componentSet = { comp, value -> comp.selectedColor = value },
-//                prop = MutableProperty(
-//                    { LxApplicationSettings.instance.getColor(blockType) },
-//                    { value -> }
-////                    { value -> LxApplicationSettings.instance.setColor(blockType, value) },
-//                ),
-//            )
-
 //        highlightColorSelect.addActionListener { event ->
 //            highlightColorSelect.selectedColor?.let { color ->
 //                previewSettings.highlightColors[blockType] = color
 //            }
 //        }
 //
-//        cell(highlightColorSelect).bind(
-//            componentGet = { comp -> comp.selectedColor ?: blockType.defaultHighlightColor() },
-//            componentSet = { comp, value -> comp.selectedColor = value },
-//            prop = MutableProperty(
-//                { LxApplicationSettings.instance.getHighlightColor(blockType) },
-//                { value -> LxApplicationSettings.instance.setHighlightColor(blockType, value) },
-//            ),
-//        )
-    }
+//        cell(highlightColorSelect)
+    }.topGap(TopGap.NONE).bottomGap(BottomGap.NONE)
 
     return colorSelect
 }
