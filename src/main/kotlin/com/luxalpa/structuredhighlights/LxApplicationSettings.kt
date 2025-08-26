@@ -7,6 +7,7 @@ import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
 import com.intellij.openapi.editor.colors.ColorKey
 import com.intellij.openapi.editor.colors.EditorColorsManager
+import com.intellij.openapi.util.Key
 import com.intellij.util.xmlb.Converter
 import com.intellij.util.xmlb.annotations.Attribute
 import com.intellij.util.xmlb.annotations.Tag
@@ -19,6 +20,8 @@ import java.awt.Color
 )
 class LxApplicationSettings :
     SerializablePersistentStateComponent<LxApplicationSettings.AppState>(AppState()), AppSettings {
+
+    private var myPreviewSettings: PreviewSettings? = null
 
     private val scheme
         get() = EditorColorsManager.getInstance().globalScheme
@@ -77,11 +80,12 @@ class LxApplicationSettings :
             updateState { it.copy(opacitySubheader = value) }
         }
 
-    fun getAllColors(): Map<BlockType, Color> =
-        BlockType.entries.associateWith { getColor(it) }
-
-    fun getAllHighlightColors(): Map<BlockType, Color> =
-        BlockType.entries.associateWith { getHighlightColor(it) }
+    val previewSettings: PreviewSettings
+        get() = myPreviewSettings ?: PreviewSettings(
+            opacityNormal,
+            opacityHeader,
+            opacitySubheader,
+        ).also { myPreviewSettings = it }
 
     override fun getOpacity(kind: Kind): Double {
         return when (kind) {
@@ -121,6 +125,34 @@ class LxApplicationSettings :
             get() = ApplicationManager.getApplication().getService(
                 LxApplicationSettings::class.java
             )
+    }
+}
+
+val LUX_PREVIEW_SETTINGS: Key<PreviewSettings> = Key.create("LUX_PREVIEW_SETTINGS")
+
+interface AppSettings {
+    fun getOpacity(kind: Kind): Double
+}
+
+class PreviewSettings(
+    var opacityNormal: Double,
+    var opacityHeader: Double,
+    var opacitySubheader: Double,
+) :
+    AppSettings {
+    override fun getOpacity(kind: Kind): Double {
+        return when (kind) {
+            Kind.Block, Kind.Identifier -> opacityNormal
+            Kind.Header -> opacityHeader
+            Kind.Subheader -> opacitySubheader
+        }
+    }
+
+    fun reset() {
+        val settings = LxApplicationSettings.instance
+        opacityNormal = settings.opacityNormal
+        opacityHeader = settings.opacityHeader
+        opacitySubheader = settings.opacitySubheader
     }
 }
 
