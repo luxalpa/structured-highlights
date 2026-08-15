@@ -141,7 +141,7 @@ class LxApplicationSettings :
         @JvmField var opacityNormal: Double = 0.01,
         @JvmField var opacityHeader: Double = 0.064,
         @JvmField var opacitySubheader: Double = 0.05,
-        @JvmField var opacityIdentifier: Double = 0.14,
+        @JvmField var opacityIdentifier: Double = 0.105,
     )
 
     @Tag("color")
@@ -203,7 +203,7 @@ class ColorConverter : Converter<Color>() {
 
 val COLOR_KEYS: Map<BlockType, ColorKey> = BlockType.entries.associateWith { blockType ->
     ColorKey.createColorKey(
-        "LUX_SH_BG_${blockType.name}",
+        "LUX_SH_RUST_BG_${blockType.name}",
         blockType.defaultColor()
     )
 }
