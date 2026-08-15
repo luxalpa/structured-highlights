@@ -1,11 +1,8 @@
 package com.luxalpa.structuredhighlights
 
 import com.intellij.application.options.colors.ColorAndFontOptions
-import com.intellij.application.options.colors.ColorAndFontSettingsListener
-import com.intellij.application.options.colors.PreviewPanel
 import com.intellij.ide.DataManager
 import com.intellij.lang.Language
-import com.intellij.openapi.editor.colors.EditorColorsScheme
 import com.intellij.openapi.editor.colors.EditorFontType
 import com.intellij.openapi.editor.ex.EditorEx
 import com.intellij.openapi.options.Configurable
@@ -13,7 +10,6 @@ import com.intellij.openapi.options.ex.Settings
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.ui.DialogPanel
-import com.intellij.openapi.util.Key
 import com.intellij.openapi.util.NlsContexts
 import com.intellij.ui.JBColor
 import com.intellij.ui.LanguageTextField

@@ -2,9 +2,9 @@ package com.luxalpa.structuredhighlights
 
 import com.intellij.codeHighlighting.*
 import com.intellij.codeHighlighting.TextEditorHighlightingPassRegistrar.Anchor
-import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.markup.*
+import com.intellij.openapi.editor.markup.CustomHighlighterOrder
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
@@ -165,7 +165,7 @@ class LxHighlightingPass(
             newHighlighters.add(highlighter)
         }
 
-        // Store the new highlighters so they can be disposed later
+        // Store the new highlighters so they can be disposed of later
         editor.putUserData(LX_HIGHLIGHTERS, newHighlighters)
     }
 }
@@ -182,14 +182,20 @@ class LxHighlightingRenderer(val blockType: BlockType, val kind: Kind, val setti
         val width = editor.contentComponent.width
 
         val baseColor = editor.colorsScheme.getColor(COLOR_KEYS.getValue(blockType)) ?: blockType.defaultColor()
-        val alpha = settings.getOpacity(kind)
+        val alpha = settings.getOpacity(kind).toFloat()
 
-        val colorWithAlpha = Color(
-            baseColor.red / 255f, baseColor.green / 255f, baseColor.blue / 255f,
-            alpha.toFloat()
+        val backgroundColor = editor.colorsScheme.defaultBackground
+
+        g.color = Color(
+            baseColor.red / 255f * alpha + backgroundColor.red / 255f * (1f - alpha),
+            baseColor.green / 255f * alpha + backgroundColor.green / 255f * (1f - alpha),
+            baseColor.blue / 255f * alpha + backgroundColor.blue / 255f * (1f - alpha),
         )
 
-        g.color = colorWithAlpha
         g.fillRect(0, startPosY, width, height)
+    }
+
+    override fun getOrder(): CustomHighlighterOrder {
+        return CustomHighlighterOrder.BEFORE_BACKGROUND
     }
 }
