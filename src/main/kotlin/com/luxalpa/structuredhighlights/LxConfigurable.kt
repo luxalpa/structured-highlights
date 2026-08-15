@@ -2,10 +2,13 @@ package com.luxalpa.structuredhighlights
 
 import com.intellij.application.options.colors.ColorAndFontOptions
 import com.intellij.ide.DataManager
+import com.intellij.ide.actions.ShowSettingsUtilImpl
 import com.intellij.lang.Language
 import com.intellij.openapi.editor.colors.EditorFontType
 import com.intellij.openapi.editor.ex.EditorEx
 import com.intellij.openapi.options.Configurable
+import com.intellij.openapi.options.SearchableConfigurable
+import com.intellij.openapi.options.ex.ConfigurableVisitor
 import com.intellij.openapi.options.ex.Settings
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectManager
@@ -161,6 +164,17 @@ class AppSettingsComponent {
         myMainPanel = JPanel(BorderLayout())
 
         val leftPanel = panel {
+            row {
+                link("Configure highlight colors…") {
+                    val settings = Settings.KEY.getData(
+                        DataManager.getInstance().getDataContext(myMainPanel)
+                    ) ?: return@link
+
+                    val colors =
+                        settings.find("reference.settingsdialog.IDE.editor.colors.Structured Highlights") ?: return@link
+                    settings.select(colors)
+                }
+            }
             group("Opacity") {
                 row("Normal:") {
                     spinner(0.0..1.0, 0.005).bindValue(
