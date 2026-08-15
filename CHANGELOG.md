@@ -4,6 +4,14 @@
 
 ## [Unreleased]
 
+## [1.0.0]
+
+- Replaced the opacity-based renderer with an opaque one. Massively improves performance during scrolling.
+- Added a setting to configure opacity of the Caret Row, since it would now completely paint over the highlights (as
+  those are now on the furthest background layer)
+- Moved color settings into the color scheme. As a consequence, there's now two settings pages: One for opacity values
+  and one for the colors on the color scheme.
+
 ## [0.0.3]
 
 - Remove platform compatibility upper bound to enable "Open-End" Compatibility. It is not expected for this plugin to
@@ -24,7 +32,9 @@ Initial release with:
 - Configuration is currently not stored within the Color profile, and there is only a preset for light mode, so dark
   mode needs to be manually adjusted (very easy though)
 
-[Unreleased]: https://github.com/luxalpa/structured-highlights/compare/v0.0.3...HEAD
+[Unreleased]: https://github.com/luxalpa/structured-highlights/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/luxalpa/structured-highlights/compare/v0.0.3...v1.0.0
+[0.0.4]: https://github.com/luxalpa/structured-highlights/compare/v0.0.3...v1.0.0
 [0.0.3]: https://github.com/luxalpa/structured-highlights/compare/v0.0.2...v0.0.3
 [0.0.2]: https://github.com/luxalpa/structured-highlights/compare/v0.0.1...v0.0.2
 [0.0.1]: https://github.com/luxalpa/structured-highlights/commits/v0.0.1
