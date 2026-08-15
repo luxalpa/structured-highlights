@@ -221,7 +221,6 @@ fun createRow(
     myDispatcher: EventDispatcher<ColorAndFontSettingsListener>
 ): ColorPanel {
     val colorSelect = ColorPanel()
-//        val highlightColorSelect = ColorPanel()
 
     panel.row("${blockType.label()}:") {
 
@@ -235,14 +234,6 @@ fun createRow(
         }
 
         cell(colorSelect)
-
-//        highlightColorSelect.addActionListener { event ->
-//            highlightColorSelect.selectedColor?.let { color ->
-//                previewSettings.highlightColors[blockType] = color
-//            }
-//        }
-//
-//        cell(highlightColorSelect)
     }
 
     return colorSelect

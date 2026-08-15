@@ -44,22 +44,8 @@ class LxApplicationSettings :
         }
     }
 
-    fun getColor(blockType: BlockType): Color {
-        return scheme.getColor(COLOR_KEYS.getValue(blockType)) ?: blockType.defaultColor()
-    }
-
     fun setColor(blockType: BlockType, color: Color) {
         scheme.setColor(COLOR_KEYS.getValue(blockType), color)
-        // No explicit scheme change notification is required for persistence.
-        // UI that depends on these colors should repaint as needed.
-    }
-
-    fun getHighlightColor(blockType: BlockType): Color {
-        return scheme.getColor(HIGHLIGHT_COLOR_KEYS.getValue(blockType)) ?: blockType.defaultHighlightColor()
-    }
-
-    fun setHighlightColor(blockType: BlockType, color: Color) {
-        scheme.setColor(HIGHLIGHT_COLOR_KEYS.getValue(blockType), color)
     }
 
     var opacityNormal: Double
@@ -80,11 +66,18 @@ class LxApplicationSettings :
             updateState { it.copy(opacitySubheader = value) }
         }
 
+    var opacityIdentifier: Double
+        get() = state.opacityIdentifier
+        set(value) {
+            updateState { it.copy(opacityIdentifier = value) }
+        }
+
     val previewSettings: PreviewSettings
         get() = myPreviewSettings ?: PreviewSettings(
             opacityNormal,
             opacityHeader,
             opacitySubheader,
+            opacityIdentifier,
         ).also { myPreviewSettings = it }
 
     override fun getOpacity(kind: Kind): Double {
@@ -92,7 +85,7 @@ class LxApplicationSettings :
             Kind.Block -> state.opacityNormal
             Kind.Header -> state.opacityHeader
             Kind.Subheader -> state.opacitySubheader
-            Kind.Identifier -> state.opacityNormal
+            Kind.Identifier -> state.opacityIdentifier
         }
     }
 
@@ -104,9 +97,12 @@ class LxApplicationSettings :
         @JvmField var highlightColors: Map<BlockType, SerializedColor> = BlockType.entries.associateWith {
             SerializedColor(it.defaultHighlightColor())
         },
+
         @JvmField var opacityNormal: Double = 0.035,
         @JvmField var opacityHeader: Double = 0.1,
         @JvmField var opacitySubheader: Double = 0.06,
+        @JvmField var opacityIdentifier: Double = 0.2,
+
         @JvmField var migratedToScheme: Boolean = false
     )
 
@@ -138,13 +134,15 @@ class PreviewSettings(
     var opacityNormal: Double,
     var opacityHeader: Double,
     var opacitySubheader: Double,
+    var opacityIdentifier: Double,
 ) :
     AppSettings {
     override fun getOpacity(kind: Kind): Double {
         return when (kind) {
-            Kind.Block, Kind.Identifier -> opacityNormal
+            Kind.Block -> opacityNormal
             Kind.Header -> opacityHeader
             Kind.Subheader -> opacitySubheader
+            Kind.Identifier -> opacityIdentifier
         }
     }
 
@@ -153,6 +151,7 @@ class PreviewSettings(
         opacityNormal = settings.opacityNormal
         opacityHeader = settings.opacityHeader
         opacitySubheader = settings.opacitySubheader
+        opacityIdentifier = settings.opacityIdentifier
     }
 }
 
@@ -168,12 +167,5 @@ val COLOR_KEYS: Map<BlockType, ColorKey> = BlockType.entries.associateWith { blo
     ColorKey.createColorKey(
         "LUX_SH_BG_${blockType.name}",
         blockType.defaultColor()
-    )
-}
-
-val HIGHLIGHT_COLOR_KEYS: Map<BlockType, ColorKey> = BlockType.entries.associateWith { blockType ->
-    ColorKey.createColorKey(
-        "LUX_SH_HL_${blockType.name}",
-        blockType.defaultHighlightColor()
     )
 }

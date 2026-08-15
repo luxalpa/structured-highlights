@@ -13,11 +13,6 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import org.rust.lang.core.psi.RsFile
 import java.awt.Color
-import java.awt.Font
-
-const val COLOR_ALPHA: Double = 0.035
-const val HEADING_ALPHA: Double = 0.1
-const val SUBHEADING_ALPHA: Double = 0.06
 
 enum class BlockType {
     ENUM,
@@ -135,17 +130,15 @@ class LxHighlightingPass(
                     descriptor.startOffset,
                     descriptor.endOffset,
                     HighlighterLayer.GUARDED_BLOCKS + 1,
-                    TextAttributes(
-                        null,
-                        null,
-//                        settings.getHighlightColor(descriptor.blockType),
-                        null,
-                        null,
-                        Font.PLAIN
-                    ),
-
+                    null,
                     HighlighterTargetArea.EXACT_RANGE
-                )
+                ).apply {
+                    customRenderer = LxExactRangeHighlightingRenderer(
+                        descriptor.blockType,
+                        descriptor.kind,
+                        settings
+                    )
+                }
             } else {
                 val highlighter = markupModel.addRangeHighlighter(
                     descriptor.startOffset,
@@ -198,4 +191,35 @@ class LxHighlightingRenderer(val blockType: BlockType, val kind: Kind, val setti
     override fun getOrder(): CustomHighlighterOrder {
         return CustomHighlighterOrder.BEFORE_BACKGROUND
     }
+}
+
+class LxExactRangeHighlightingRenderer(
+    private val blockType: BlockType,
+    private val kind: Kind,
+    private val settings: AppSettings
+) : CustomHighlighterRenderer {
+    override fun paint(editor: Editor, highlighter: RangeHighlighter, g: java.awt.Graphics) {
+        val start = editor.offsetToXY(highlighter.startOffset)
+        val end = editor.offsetToXY(highlighter.endOffset)
+        val lineHeight = editor.lineHeight
+
+        val baseColor =
+            editor.colorsScheme.getColor(COLOR_KEYS.getValue(blockType))
+                ?: blockType.defaultColor()
+        val backgroundColor = editor.colorsScheme.defaultBackground
+        val alpha = settings.getOpacity(kind).toFloat()
+
+        g.color = Color(
+            baseColor.red / 255f * alpha + backgroundColor.red / 255f * (1f - alpha),
+            baseColor.green / 255f * alpha + backgroundColor.green / 255f * (1f - alpha),
+            baseColor.blue / 255f * alpha + backgroundColor.blue / 255f * (1f - alpha),
+        )
+
+        if (start.y == end.y) {
+            g.fillRect(start.x, start.y, end.x - start.x, lineHeight)
+        }
+    }
+
+    override fun getOrder(): CustomHighlighterOrder =
+        CustomHighlighterOrder.BEFORE_BACKGROUND
 }

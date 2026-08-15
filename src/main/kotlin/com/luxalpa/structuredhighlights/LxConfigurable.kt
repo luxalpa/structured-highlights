@@ -192,6 +192,16 @@ class AppSettingsComponent {
                         }
                     }
                 }
+                row("Identifier:") {
+                    spinner(0.0..1.0, 0.005).bindValue(
+                        LxApplicationSettings.instance::opacityIdentifier
+                    ).applyToComponent {
+                        addChangeListener {
+                            previewSettings.opacityIdentifier = value as Double
+                            refresh()
+                        }
+                    }
+                }
             }
         }
 
