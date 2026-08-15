@@ -26,50 +26,86 @@ class LxApplicationSettings :
     private val scheme
         get() = EditorColorsManager.getInstance().globalScheme
 
+    private val currentSettings: V2State
+        get() = state.v2 ?: V2State()
+
     override fun loadState(state: AppState) {
         super.loadState(state)
-        if (!state.migratedToScheme) {
-            debug { "Migrating scheme" }
-            BlockType.entries.forEach { blockType ->
-                state.colors[blockType]?.c?.let {
-                    setColor(blockType, it)
-                }
-                state.highlightColors[blockType]?.c?.let {
-                    setColor(blockType, it)
-                }
+
+        if (state.v2 == null) {
+            val migrated = when {
+                hasLegacyState(state) -> migrateLegacyToV2(state)
+                else -> V2State()
             }
+
             updateState {
-                it.copy(migratedToScheme = true)
+                it.copy(v2 = migrated)
             }
         }
     }
 
-    fun setColor(blockType: BlockType, color: Color) {
-        scheme.setColor(COLOR_KEYS.getValue(blockType), color)
+    private fun migrateLegacyToV2(state: AppState): V2State {
+        // -- The colors now live in the color scheme instead.
+        val legacyColors =
+            state.highlightColors.orEmpty() + state.colors.orEmpty()
+
+        if (legacyColors.isNotEmpty()) {
+            debug { "Migrating to scheme" }
+
+            legacyColors.forEach { (blockType, serializedColor) ->
+                scheme.setColor(COLOR_KEYS.getValue(blockType), serializedColor.c)
+            }
+        }
+
+        // The default values here are from the OLD version, because the serializer skips the defaults.
+        val opacityNormal = state.opacityNormal ?: 0.035
+
+        return V2State(
+            opacityNormal,
+            opacityHeader = 1f - (1f - (state.opacityHeader ?: 0.1)) * (1f - opacityNormal),
+            opacitySubheader = 1f - (1f - (state.opacitySubheader ?: 0.06)) * (1f - opacityNormal),
+        )
+    }
+
+    private fun hasLegacyState(state: AppState): Boolean =
+        !state.colors.isNullOrEmpty() ||
+                !state.highlightColors.isNullOrEmpty() ||
+                state.opacityNormal != null ||
+                state.opacityHeader != null ||
+                state.opacitySubheader != null
+
+    private fun updateCurrentSettings(
+        transform: (V2State) -> V2State
+    ) {
+        updateState { appState ->
+            appState.copy(
+                v2 = transform(appState.v2 ?: V2State())
+            )
+        }
     }
 
     var opacityNormal: Double
-        get() = state.opacityNormal
+        get() = currentSettings.opacityNormal
         set(value) {
-            updateState { it.copy(opacityNormal = value) }
+            updateCurrentSettings { it.copy(opacityNormal = value) }
         }
 
     var opacityHeader: Double
-        get() = state.opacityHeader
+        get() = currentSettings.opacityHeader
         set(value) {
-            updateState { it.copy(opacityHeader = value) }
+            updateCurrentSettings { it.copy(opacityHeader = value) }
         }
 
     var opacitySubheader: Double
-        get() = state.opacitySubheader
+        get() = currentSettings.opacitySubheader
         set(value) {
-            updateState { it.copy(opacitySubheader = value) }
+            updateCurrentSettings { it.copy(opacitySubheader = value) }
         }
 
     var opacityIdentifier: Double
-        get() = state.opacityIdentifier
+        get() = currentSettings.opacityIdentifier
         set(value) {
-            updateState { it.copy(opacityIdentifier = value) }
+            updateCurrentSettings { it.copy(opacityIdentifier = value) }
         }
 
     val previewSettings: PreviewSettings
@@ -82,28 +118,30 @@ class LxApplicationSettings :
 
     override fun getOpacity(kind: Kind): Double {
         return when (kind) {
-            Kind.Block -> state.opacityNormal
-            Kind.Header -> state.opacityHeader
-            Kind.Subheader -> state.opacitySubheader
-            Kind.Identifier -> state.opacityIdentifier
+            Kind.Block -> currentSettings.opacityNormal
+            Kind.Header -> currentSettings.opacityHeader
+            Kind.Subheader -> currentSettings.opacitySubheader
+            Kind.Identifier -> currentSettings.opacityIdentifier
         }
     }
 
     data class AppState(
-        // Kept for one-time migration; no longer the source of truth for colors.
-        @JvmField var colors: Map<BlockType, SerializedColor> = BlockType.entries.associateWith {
-            SerializedColor(it.defaultColor())
-        },
-        @JvmField var highlightColors: Map<BlockType, SerializedColor> = BlockType.entries.associateWith {
-            SerializedColor(it.defaultHighlightColor())
-        },
+        // Retained after migration to support downgrading to an older plugin.
+        // Null means that no settings from the legacy version were loaded.
+        @JvmField var colors: Map<BlockType, SerializedColor>? = null,
+        @JvmField var highlightColors: Map<BlockType, SerializedColor>? = null,
+        @JvmField var opacityNormal: Double? = null,
+        @JvmField var opacityHeader: Double? = null,
+        @JvmField var opacitySubheader: Double? = null,
 
-        @JvmField var opacityNormal: Double = 0.035,
-        @JvmField var opacityHeader: Double = 0.1,
-        @JvmField var opacitySubheader: Double = 0.06,
-        @JvmField var opacityIdentifier: Double = 0.2,
+        @JvmField var v2: V2State? = null,
+    )
 
-        @JvmField var migratedToScheme: Boolean = false
+    data class V2State(
+        @JvmField var opacityNormal: Double = 0.01,
+        @JvmField var opacityHeader: Double = 0.064,
+        @JvmField var opacitySubheader: Double = 0.05,
+        @JvmField var opacityIdentifier: Double = 0.14,
     )
 
     @Tag("color")

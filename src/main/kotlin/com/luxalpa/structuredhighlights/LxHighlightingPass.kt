@@ -23,21 +23,12 @@ enum class BlockType {
     MODULE;
 
     fun defaultColor(): Color = when (this) {
-        ENUM -> Color(-1083409)
-        STRUCT -> Color(-15329590)
+        ENUM -> Color(-2490113)
+        STRUCT -> Color(-16756225)
         TRAIT -> Color(-16521928)
-        IMPL -> Color(-6724070)
-        FUNCTION -> Color(-6743526)
+        IMPL -> Color(-20992)
+        FUNCTION -> Color(-842752)
         MODULE -> Color(-10066330)
-    }
-
-    fun defaultHighlightColor(): Color = when (this) {
-        ENUM -> Color(-593418)
-        STRUCT -> Color(-921096)
-        TRAIT -> Color(-1181971)
-        IMPL -> Color(-922131)
-        FUNCTION -> Color(-462094)
-        MODULE -> Color(-1381654)
     }
 
     fun label(): String {
