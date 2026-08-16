@@ -34,7 +34,6 @@ Initial release with:
 
 [Unreleased]: https://github.com/luxalpa/structured-highlights/compare/v1.0.0...HEAD
 [1.0.0]: https://github.com/luxalpa/structured-highlights/compare/v0.0.3...v1.0.0
-[0.0.4]: https://github.com/luxalpa/structured-highlights/compare/v0.0.3...v1.0.0
 [0.0.3]: https://github.com/luxalpa/structured-highlights/compare/v0.0.2...v0.0.3
 [0.0.2]: https://github.com/luxalpa/structured-highlights/compare/v0.0.1...v0.0.2
 [0.0.1]: https://github.com/luxalpa/structured-highlights/commits/v0.0.1
