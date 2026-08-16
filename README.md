@@ -59,5 +59,3 @@ will then discard any of the newer version's properties. This could theoreticall
 instead for different versions, however, this use-case seems too narrow imo to be worth the implementation effort.
 
 [template]: https://github.com/JetBrains/intellij-platform-plugin-template
-
-[docs:plugin-description]: https://plugins.jetbrains.com/docs/intellij/plugin-user-experience.html#plugin-description-and-presentation
