@@ -29,31 +29,48 @@ class LxApplicationSettings :
     private val currentSettings: V2State
         get() = state.v2 ?: V2State()
 
+    override fun noStateLoaded() {
+        super.noStateLoaded()
+        updateCurrentSettings { it.copy(active = true) }
+    }
+
     override fun loadState(state: AppState) {
         super.loadState(state)
 
         if (state.v2 == null) {
-            val migrated = when {
-                hasLegacyState(state) -> migrateLegacyToV2(state)
-                else -> V2State()
+            if (hasLegacyState(state)) {
+                val migrated = migrateLegacyToV2(state)
+                migrated.active = true
+                updateState { it.copy(v2 = migrated) }
+            } else {
+                updateState { it.copy(v2 = V2State(active = true)) }
             }
-
-            updateState {
-                it.copy(v2 = migrated)
+        } else {
+            if (!state.v2!!.active) {
+                updateCurrentSettings { it.copy(active = true) }
             }
         }
     }
 
     private fun migrateLegacyToV2(state: AppState): V2State {
         // -- The colors now live in the color scheme instead.
-        val legacyColors =
-            state.highlightColors.orEmpty() + state.colors.orEmpty()
+        val legacyDefaultColors = mapOf(
+            BlockType.ENUM to Color(-1083409),
+            BlockType.STRUCT to Color(-15329590),
+            BlockType.TRAIT to Color(-16521928),
+            BlockType.IMPL to Color(-6724070),
+            BlockType.FUNCTION to Color(-6743526),
+            BlockType.MODULE to Color(-10066330),
+        )
 
-        if (legacyColors.isNotEmpty()) {
+        val actualColors =
+            legacyDefaultColors + state.colors.orEmpty().mapValues { (_, serializedColor) -> serializedColor.c }
+
+        if (actualColors.isNotEmpty()) {
             debug { "Migrating to scheme" }
 
-            legacyColors.forEach { (blockType, serializedColor) ->
-                scheme.setColor(COLOR_KEYS.getValue(blockType), serializedColor.c)
+            actualColors.forEach { (blockType, color) ->
+                scheme.setColor(COLOR_KEYS.getValue(blockType), color)
             }
         }
 
@@ -61,7 +78,7 @@ class LxApplicationSettings :
         val opacityNormal = state.opacityNormal ?: 0.035
 
         return V2State(
-            opacityNormal,
+            opacityNormal = opacityNormal,
             opacityHeader = 1f - (1f - (state.opacityHeader ?: 0.1)) * (1f - opacityNormal),
             opacitySubheader = 1f - (1f - (state.opacitySubheader ?: 0.06)) * (1f - opacityNormal),
         )
@@ -138,6 +155,9 @@ class LxApplicationSettings :
     )
 
     data class V2State(
+        // This field will be set automatically for anyone who starts the app in v2.
+        // It exists to track which versions had been configured, as the defaults are not visible otherwise.
+        @JvmField var active: Boolean = false,
         @JvmField var opacityNormal: Double = 0.01,
         @JvmField var opacityHeader: Double = 0.064,
         @JvmField var opacitySubheader: Double = 0.05,
