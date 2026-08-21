@@ -4,6 +4,10 @@
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-08-21
+
+- Fixed an issue where the migration script prevented changes to the color scheme to persist over IDE restarts.
+
 ## [1.0.0]
 
 - Replaced the opacity-based renderer with an opaque one. Massively improves performance during scrolling.
@@ -32,7 +36,8 @@ Initial release with:
 - Configuration is currently not stored within the Color profile, and there is only a preset for light mode, so dark
   mode needs to be manually adjusted (very easy though)
 
-[Unreleased]: https://github.com/luxalpa/structured-highlights/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/luxalpa/structured-highlights/compare/v1.0.1...HEAD
+[1.0.1]: https://github.com/luxalpa/structured-highlights/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/luxalpa/structured-highlights/compare/v0.0.3...v1.0.0
 [0.0.3]: https://github.com/luxalpa/structured-highlights/compare/v0.0.2...v0.0.3
 [0.0.2]: https://github.com/luxalpa/structured-highlights/compare/v0.0.1...v0.0.2
