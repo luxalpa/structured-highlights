@@ -7,6 +7,7 @@
 ## [1.0.1] - 2026-08-21
 
 - Fixed an issue where the migration script prevented changes to the color scheme to persist over IDE restarts.
+- Change Color Settings Page in preparation for supporting multiple languages.
 
 ## [1.0.0]
 
