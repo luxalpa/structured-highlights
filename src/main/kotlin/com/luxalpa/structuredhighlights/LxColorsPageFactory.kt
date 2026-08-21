@@ -1,7 +1,15 @@
 package com.luxalpa.structuredhighlights
 
-import com.intellij.application.options.colors.*
+import com.intellij.application.options.colors.ColorAndFontDescription
+import com.intellij.application.options.colors.ColorAndFontDescriptionPanel
+import com.intellij.application.options.colors.ColorAndFontOptions
+import com.intellij.application.options.colors.ColorAndFontPanelFactory
+import com.intellij.application.options.colors.ColorAndFontSettingsListener
+import com.intellij.application.options.colors.NewColorAndFontPanel
+import com.intellij.application.options.colors.OptionsPanelImpl
 import com.intellij.application.options.colors.OptionsPanelImpl.ColorDescriptionPanel
+import com.intellij.application.options.colors.PreviewPanel
+import com.intellij.application.options.colors.SchemesPanel
 import com.intellij.openapi.editor.colors.EditorColors
 import com.intellij.openapi.editor.colors.EditorColorsScheme
 import com.intellij.openapi.editor.colors.EditorSchemeAttributeDescriptor
