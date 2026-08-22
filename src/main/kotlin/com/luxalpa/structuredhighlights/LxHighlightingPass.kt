@@ -11,37 +11,9 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Key
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
+import com.luxalpa.structuredhighlights.languages.RustVisitor
 import org.rust.lang.core.psi.RsFile
 import java.awt.Color
-
-enum class BlockType {
-    ENUM,
-    STRUCT,
-    TRAIT,
-    IMPL,
-    FUNCTION,
-    MODULE;
-
-    fun defaultColor(): Color = when (this) {
-        ENUM -> Color(-2490113)
-        STRUCT -> Color(-16756225)
-        TRAIT -> Color(-16521928)
-        IMPL -> Color(-20992)
-        FUNCTION -> Color(-842752)
-        MODULE -> Color(-10066330)
-    }
-
-    fun label(): String {
-        return when (this) {
-            ENUM -> "Enum"
-            STRUCT -> "Struct"
-            TRAIT -> "Trait"
-            IMPL -> "Impl"
-            FUNCTION -> "Function"
-            MODULE -> "Module"
-        }
-    }
-}
 
 enum class Mode {
     FULL_LINE,
@@ -92,12 +64,11 @@ class LxHighlightingPass(
     private val editor: Editor
 ) : TextEditorHighlightingPass(file.project, editor.document, false), DumbAware {
     override fun doCollectInformation(progress: ProgressIndicator) {
-        val file = file as? RsFile ?: return
-        val visitor = RustVisitor()
+        val descriptors = LanguageSupport.EP.extensionList
+            .firstNotNullOfOrNull { it.collectDescriptors(file) }
+            ?: return
 
-        file.accept(visitor)
-
-        editor.putUserData(LX_DESCRIPTORS, visitor.definitions)
+        editor.putUserData(LX_DESCRIPTORS, descriptors)
     }
 
     override fun doApplyInformationToEditor() {
@@ -165,7 +136,7 @@ class LxHighlightingRenderer(val blockType: BlockType, val kind: Kind, val setti
         val height = endPosY - startPosY
         val width = editor.contentComponent.width
 
-        val baseColor = editor.colorsScheme.getColor(COLOR_KEYS.getValue(blockType)) ?: blockType.defaultColor()
+        val baseColor = editor.colorsScheme.getColor(blockType.colorKey) ?: blockType.defaultColor
         val alpha = settings.getOpacity(kind).toFloat()
 
         val backgroundColor = editor.colorsScheme.defaultBackground
@@ -194,9 +165,7 @@ class LxExactRangeHighlightingRenderer(
         val end = editor.offsetToXY(highlighter.endOffset)
         val lineHeight = editor.lineHeight
 
-        val baseColor =
-            editor.colorsScheme.getColor(COLOR_KEYS.getValue(blockType))
-                ?: blockType.defaultColor()
+        val baseColor = editor.colorsScheme.getColor(blockType.colorKey) ?: blockType.defaultColor
         val backgroundColor = editor.colorsScheme.defaultBackground
         val alpha = settings.getOpacity(kind).toFloat()
 

@@ -5,9 +5,14 @@
     <vendor>Luxalpa</vendor>
 
     <depends>com.intellij.modules.platform</depends>
-    <depends>com.jetbrains.rust</depends>
+    <depends optional="true" config-file="myplugin-rust.xml">com.jetbrains.rust</depends>
 
     <resource-bundle>messages.MyBundle</resource-bundle>
+
+    <extensionPoints>
+        <extensionPoint name="languageSupport" interface="com.luxalpa.structuredhighlights.LanguageSupport"
+                        dynamic="true"/>
+    </extensionPoints>
 
     <extensions defaultExtensionNs="com.intellij">
         <applicationConfigurable instance="com.luxalpa.structuredhighlights.LxConfigurable"

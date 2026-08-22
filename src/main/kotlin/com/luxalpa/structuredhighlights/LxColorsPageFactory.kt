@@ -83,12 +83,14 @@ class LxColorsPageFactory : ColorAndFontPanelFactory, ColorAndFontDescriptorsPro
     override fun getAttributeDescriptors(): Array<out AttributesDescriptor?> = emptyArray<AttributesDescriptor>()
 
     override fun getColorDescriptors(): Array<out ColorDescriptor?> {
-        val pluginColors = COLOR_KEYS.entries.map {
-            ColorDescriptor(
-                "Languages//Rust//" + it.key.label(),
-                it.value,
-                ColorDescriptor.Kind.BACKGROUND
-            )
+        val pluginColors = LanguageSupport.EP.extensionList.flatMap { support ->
+            support.blockTypes.map { blockType ->
+                ColorDescriptor(
+                    "Languages//${support.displayName}//${blockType.label}",
+                    blockType.colorKey,
+                    ColorDescriptor.Kind.BACKGROUND
+                )
+            }
         }
 
         return (

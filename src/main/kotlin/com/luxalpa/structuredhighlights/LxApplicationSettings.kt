@@ -55,12 +55,12 @@ class LxApplicationSettings :
     private fun migrateLegacyToV2(state: AppState): V2State {
         // -- The colors now live in the color scheme instead.
         val legacyDefaultColors = mapOf(
-            BlockType.ENUM to Color(-1083409),
-            BlockType.STRUCT to Color(-15329590),
-            BlockType.TRAIT to Color(-16521928),
-            BlockType.IMPL to Color(-6724070),
-            BlockType.FUNCTION to Color(-6743526),
-            BlockType.MODULE to Color(-10066330),
+            LegacyBlockType.ENUM to Color(-1083409),
+            LegacyBlockType.STRUCT to Color(-15329590),
+            LegacyBlockType.TRAIT to Color(-16521928),
+            LegacyBlockType.IMPL to Color(-6724070),
+            LegacyBlockType.FUNCTION to Color(-6743526),
+            LegacyBlockType.MODULE to Color(-10066330),
         )
 
         val actualColors =
@@ -70,7 +70,8 @@ class LxApplicationSettings :
             debug { "Migrating to scheme" }
 
             actualColors.forEach { (blockType, color) ->
-                scheme.setColor(COLOR_KEYS.getValue(blockType), color)
+                val key = ColorKey.createColorKey("LUX_SH_RUST_BG_${blockType.name}")
+                scheme.setColor(key, color)
             }
         }
 
@@ -145,8 +146,8 @@ class LxApplicationSettings :
     data class AppState(
         // Retained after migration to support downgrading to an older plugin.
         // Null means that no settings from the legacy version were loaded.
-        @JvmField var colors: Map<BlockType, SerializedColor>? = null,
-        @JvmField var highlightColors: Map<BlockType, SerializedColor>? = null,
+        @JvmField var colors: Map<LegacyBlockType, SerializedColor>? = null,
+        @JvmField var highlightColors: Map<LegacyBlockType, SerializedColor>? = null,
         @JvmField var opacityNormal: Double? = null,
         @JvmField var opacityHeader: Double? = null,
         @JvmField var opacitySubheader: Double? = null,
@@ -221,9 +222,12 @@ class ColorConverter : Converter<Color>() {
     override fun toString(value: Color): String = value.rgb.toString()
 }
 
-val COLOR_KEYS: Map<BlockType, ColorKey> = BlockType.entries.associateWith { blockType ->
-    ColorKey.createColorKey(
-        "LUX_SH_RUST_BG_${blockType.name}",
-        blockType.defaultColor()
-    )
+/// V1 / V2 block type
+enum class LegacyBlockType {
+    ENUM,
+    STRUCT,
+    TRAIT,
+    IMPL,
+    FUNCTION,
+    MODULE;
 }

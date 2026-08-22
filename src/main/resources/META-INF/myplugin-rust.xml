@@ -1,0 +1,6 @@
+<!-- META-INF/myplugin-rust.xml  (loaded only if Rust is installed) -->
+<idea-plugin>
+    <extensions defaultExtensionNs="com.luxalpa.structuredhighlights">
+        <languageSupport implementation="com.luxalpa.structuredhighlights.languages.Rust"/>
+    </extensions>
+</idea-plugin>
