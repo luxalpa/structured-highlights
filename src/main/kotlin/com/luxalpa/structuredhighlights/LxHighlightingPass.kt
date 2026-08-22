@@ -11,8 +11,6 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Key
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
-import com.luxalpa.structuredhighlights.languages.RustVisitor
-import org.rust.lang.core.psi.RsFile
 import java.awt.Color
 
 enum class Mode {

@@ -65,7 +65,11 @@ class AppSettingsComponent {
         previewSettings = LxApplicationSettings.instance.previewSettings
         previewSettings.reset()
 
-        textField = LxLanguageTextField(project, PREVIEW_TEXT)
+        val (previewText, languageId) = LanguageSupport.EP.extensionList.firstOrNull()?.let {
+            it.previewText to it.languageId
+        } ?: ("No preview text available." to "")
+
+        textField = LxLanguageTextField(project, previewText, languageId)
 
         myMainPanel = JPanel(BorderLayout())
 

@@ -17,6 +17,8 @@ interface LanguageSupport {
     fun collectDescriptors(file: PsiFile): List<DefinitionBlockDescriptor>?
     val blockTypes: List<BlockType>
     val displayName: String
+    val previewText: String
+    val languageId: String
 }
 
 interface BlockType {

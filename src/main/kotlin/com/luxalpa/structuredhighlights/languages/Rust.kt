@@ -30,6 +30,8 @@ class Rust : LanguageSupport {
 
     override val blockTypes: List<BlockType> = RsBlockType.entries.toList()
     override val displayName: String = "Rust"
+    override val languageId: String = "Rust"
+    override val previewText: String = PREVIEW_TEXT
 }
 
 enum class RsBlockType(
@@ -178,3 +180,57 @@ class RustVisitor : RsRecursiveVisitor() {
         }
     }
 }
+
+
+val PREVIEW_TEXT = """
+    trait Terrible {
+        fn breathe_fire(&self);
+        fn devour(&self, num_people: usize);
+    }
+
+    #[derive(Clone, Debug)]
+    struct Dragon {
+        pub name: String,
+        pub age: f32
+    }
+
+    impl Dragon {
+        pub fn roar(&self) {
+            println!("Roar!!!");
+        }
+    }
+
+    impl Terrible for Dragon {
+        fn breathe_fire(&self) {
+            println!("Breathing fire!");
+            self.roar();
+        }
+        
+        fn devour(&self, num_people: usize) {
+            println!("Devouring {} snacks", num_people);
+            self.roar();
+        }
+    }
+
+    enum Weapon {
+        Tail,
+        Claws { num_talons: usize },
+        Wings,
+        Teeth(usize),
+        Fire,
+    }
+
+    #[cfg(test)]
+    mod tests {
+        use super::*;
+
+        fn test_dragon() {
+            let dragon = Dragon {
+                name: "Smaug".to_string(),
+                age: 7000.0,
+            };
+
+            dragon.breathe_fire();
+        }
+    }
+""".trimIndent()

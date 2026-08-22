@@ -10,6 +10,7 @@ import com.intellij.application.options.colors.OptionsPanelImpl
 import com.intellij.application.options.colors.OptionsPanelImpl.ColorDescriptionPanel
 import com.intellij.application.options.colors.PreviewPanel
 import com.intellij.application.options.colors.SchemesPanel
+import com.intellij.lang.Language
 import com.intellij.openapi.editor.colors.EditorColors
 import com.intellij.openapi.editor.colors.EditorColorsScheme
 import com.intellij.openapi.editor.colors.EditorSchemeAttributeDescriptor
@@ -20,6 +21,7 @@ import com.intellij.openapi.options.colors.ColorDescriptor
 import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.util.Condition
 import com.intellij.openapi.util.NlsContexts
+import com.intellij.ui.LanguageTextField
 import com.intellij.ui.dsl.builder.panel
 import com.intellij.util.EventDispatcher
 import java.awt.Color
@@ -107,16 +109,45 @@ class LxColorsPageFactory : ColorAndFontPanelFactory, ColorAndFontDescriptorsPro
 
 class LxPreviewPanel(options: ColorAndFontOptions) : PreviewPanel {
     var textField: LxLanguageTextField?
+    private var currentSupport: LanguageSupport? = null
 
     init {
         val openProjects = ProjectManager.getInstance().openProjects
         val project = if (openProjects.isNotEmpty()) openProjects[0] else ProjectManager.getInstance().defaultProject
 
-        textField = LxLanguageTextField(project, PREVIEW_TEXT, options)
+        currentSupport = LanguageSupport.EP.extensionList.firstOrNull()
+
+        textField = LxLanguageTextField(
+            project,
+            currentSupport?.previewText ?: "No preview text available.",
+            currentSupport?.languageId ?: "",
+            options
+        )
+    }
+
+    private fun supportFor(selected: EditorSchemeAttributeDescriptor): LanguageSupport? {
+        val type = selected.type ?: return null
+        return LanguageSupport.EP.extensionList.firstOrNull { support ->
+            support.blockTypes.any { it.key == type || it.colorKey.externalName == type }
+        }
     }
 
     override fun blinkSelectedHighlightType(selected: Any?) {
+        val desc = selected as? EditorSchemeAttributeDescriptor ?: return
+        val support = supportFor(desc) ?: return
 
+        if (support === currentSupport) return
+
+        val openProjects = ProjectManager.getInstance().openProjects
+        val project = if (openProjects.isNotEmpty()) openProjects[0] else ProjectManager.getInstance().defaultProject
+
+        val language = Language.findLanguageByID(support.languageId) ?: return
+        val fileType = language.associatedFileType ?: return
+        val doc = LanguageTextField.createDocument(
+            support.previewText, language, project, LanguageTextField.SimpleDocumentCreator()
+        )
+
+        textField!!.setNewDocumentAndFileType(fileType, doc)
     }
 
     override fun disposeUIResources() {
