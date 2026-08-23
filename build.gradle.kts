@@ -12,12 +12,13 @@ tasks.runIde {
 
 dependencies {
     intellijPlatform {
-        rustRover("2025.2")
-//        intellijIdea("2025.2")
+//        rustRover("2025.2")
+        intellijIdea("2025.2")
 
         // Plugin Dependencies -> https://plugins.jetbrains.com/docs/intellij/plugin-dependencies.html
         plugins("com.jetbrains.rust:252.23892.452")
         plugins("org.jetbrains.kotlin:252.28539.97-IJ")
+        plugins("com.intellij.java:252.23892.409")
 //        bundledPlugin("com.jetbrains.rust")
         bundledPlugin("org.toml.lang")
     }

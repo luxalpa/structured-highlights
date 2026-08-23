@@ -7,15 +7,13 @@ import com.luxalpa.structuredhighlights.DefinitionBlockDescriptor
 import com.luxalpa.structuredhighlights.Descriptor
 import com.luxalpa.structuredhighlights.Kind
 import com.luxalpa.structuredhighlights.LanguageSupport
-import com.luxalpa.structuredhighlights.debug
 import org.intellij.lang.annotations.Language
 import org.jetbrains.kotlin.psi.KtClass
-import org.jetbrains.kotlin.psi.KtClassOrObject
 import org.jetbrains.kotlin.psi.KtEnumEntry
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtNamedFunction
+import org.jetbrains.kotlin.psi.KtObjectDeclaration
 import org.jetbrains.kotlin.psi.KtTreeVisitorVoid
-import org.jetbrains.kotlin.psi.KtVisitorVoid
 import java.awt.Color
 
 class Kotlin : LanguageSupport {
@@ -36,10 +34,11 @@ enum class KtBlockType(
     override val label: String,
     override val defaultColor: Color,
 ) : BlockType {
-    CLASS("Class", DefaultColor.STRUCT),
+    CLASS("Class", DefaultColor.CLASS),
     FUNCTION("Function", DefaultColor.FUNCTION),
     INTERFACE("Interface", DefaultColor.INTERFACE),
-    ENUM("Enum", DefaultColor.ENUM);
+    ENUM("Enum", DefaultColor.ENUM),
+    OBJECT("Object", DefaultColor.CLASS);
 
     override val key: String get() = "LUX_SH_KOTLIN_BG_$name"
     override val colorKey: ColorKey = ColorKey.createColorKey(key, defaultColor)
@@ -70,8 +69,21 @@ class KotlinVisitor : KtTreeVisitorVoid() {
         }
     }
 
+    override fun visitObjectDeclaration(o: KtObjectDeclaration) {
+        val descriptors = buildList {
+            add(Descriptor(Kind.Block, o))
+            o.nameIdentifier?.let {
+                add(Descriptor(Kind.Header, it))
+                add(Descriptor(Kind.Identifier, it))
+            }
+        }
+        collector.collect(KtBlockType.OBJECT, descriptors) {
+            super.visitObjectDeclaration(o)
+        }
+    }
+
     override fun visitNamedFunction(o: KtNamedFunction) {
-        if (!o.hasBody()) {
+        if (!o.hasBody() || !o.hasBlockBody()) {
             super.visitNamedFunction(o)
             return
         }
@@ -102,7 +114,7 @@ private val PREVIEW_TEXT = """
     }
 
     enum class Color {
-        RED, BLUE, GREEN
+        RED
     }
 
     fun main() {

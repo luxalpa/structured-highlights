@@ -41,10 +41,10 @@ enum class RsBlockType(
     ENUM("Enum", DefaultColor.ENUM),
     STRUCT("Struct", DefaultColor.STRUCT),
     TRAIT("Trait", DefaultColor.INTERFACE),
-    IMPL("Impl", Color(-20992)),
+    IMPL("Impl", DefaultColor.CLASS),
     FUNCTION("Function", DefaultColor.FUNCTION),
     MODULE("Module", DefaultColor.MODULE),
-    MACRORULES("Macro Definition", Color(-10066330));
+    MACRORULES("Macro Definition", DefaultColor.MACRO_DEFINITION);
 
     override val key: String get() = "LUX_SH_RUST_BG_$name"
     override val colorKey: ColorKey = ColorKey.createColorKey(key, defaultColor)
