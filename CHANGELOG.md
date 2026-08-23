@@ -6,8 +6,11 @@
 
 - Color `macro_rules` definitions
 - Improve coloring for trait functions without bodies.
-- Add support for TOML
-- Add support for Kotlin
+- Add support for:
+    - TOML
+    - Kotlin
+    - Java
+    - PHP
 
 ## [1.0.2] - 2026-08-21
 

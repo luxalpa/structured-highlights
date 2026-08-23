@@ -19,8 +19,9 @@ dependencies {
         plugins("com.jetbrains.rust:252.23892.452")
         plugins("org.jetbrains.kotlin:252.28539.97-IJ")
         plugins("com.intellij.java:252.23892.409")
+        plugins("com.jetbrains.php:252.23892.458")
 //        bundledPlugin("com.jetbrains.rust")
-        bundledPlugin("org.toml.lang")
+        plugins("org.toml.lang:252.28238.9")
     }
 }
 

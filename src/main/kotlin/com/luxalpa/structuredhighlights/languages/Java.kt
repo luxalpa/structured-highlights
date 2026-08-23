@@ -129,8 +129,8 @@ private val PREVIEW_TEXT = """
         TEETH,
         FIRE;
 
-        public void equip() {
-            System.out.println("Equipped " + this);
+        public void attack() {
+            System.out.println("Attacked using " + this);
         }
     }
 
