@@ -173,7 +173,6 @@ class LxPreviewPanel(options: ColorAndFontOptions) : PreviewPanel {
         editor.colorsScheme = scheme
         debug { "Updating scheme" }
     }
-
 }
 
 

@@ -104,7 +104,7 @@ class RustVisitor : RsRecursiveVisitor() {
         // Modules will still be colored like their parents, but freestanding modules will not pass on their
         // color to their children.
         val descriptors = buildList {
-//            add(Descriptor(Kind.Block, o))
+            add(Descriptor(Kind.Block, o))
             o.identifier.let {
                 add(Descriptor(Kind.Header, it))
                 add(Descriptor(Kind.Identifier, it))
