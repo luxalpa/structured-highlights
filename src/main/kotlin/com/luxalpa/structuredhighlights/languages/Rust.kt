@@ -17,6 +17,7 @@ import org.rust.lang.core.psi.RsModItem
 import org.rust.lang.core.psi.RsRecursiveVisitor
 import org.rust.lang.core.psi.RsStructItem
 import org.rust.lang.core.psi.RsTraitItem
+import org.rust.lang.core.psi.ext.body
 import java.awt.Color
 
 class Rust : LanguageSupport {
@@ -37,12 +38,12 @@ enum class RsBlockType(
     override val label: String,
     override val defaultColor: Color,
 ) : BlockType {
-    ENUM("Enum", Color(-2490113)),
-    STRUCT("Struct", Color(-16756225)),
-    TRAIT("Trait", Color(-16521928)),
+    ENUM("Enum", DefaultColor.ENUM),
+    STRUCT("Struct", DefaultColor.STRUCT),
+    TRAIT("Trait", DefaultColor.INTERFACE),
     IMPL("Impl", Color(-20992)),
-    FUNCTION("Function", Color(-842752)),
-    MODULE("Module", Color(-10066330)),
+    FUNCTION("Function", DefaultColor.FUNCTION),
+    MODULE("Module", DefaultColor.MODULE),
     MACRORULES("Macro Definition", Color(-10066330));
 
     override val key: String get() = "LUX_SH_RUST_BG_$name"
@@ -84,6 +85,11 @@ class RustVisitor : RsRecursiveVisitor() {
     }
 
     override fun visitFunction(o: RsFunction) {
+        if (o.body == null) {
+            super.visitFunction(o)
+            return
+        }
+
         val descriptors = buildList {
             // Currently, we don't allow blocks inside blocks due to performance issues.
             if (collector.isTopLevel) {
@@ -198,10 +204,10 @@ private val PREVIEW_TEXT = """
         Fire,
     }
     
-    macro_rules! build_dragon {
+    macro_rules! wake_dragon {
         () => {
             Dragon {
-                name: "Smaug".to_string(),
+                name: "Bahamut".to_string(),
                 age: 7000.0,
             }
         };

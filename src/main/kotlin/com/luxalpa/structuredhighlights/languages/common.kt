@@ -7,6 +7,7 @@ import com.luxalpa.structuredhighlights.DefinitionBlockDescriptor
 import com.luxalpa.structuredhighlights.Descriptor
 import com.luxalpa.structuredhighlights.Kind
 import com.luxalpa.structuredhighlights.Mode
+import java.awt.Color
 
 // For handling nesting.
 class BlockCollector {
@@ -45,5 +46,15 @@ class BlockCollector {
 
         visit()
         if (isTopLevel) curBlockType = null
+    }
+}
+
+class DefaultColor {
+    companion object {
+        val STRUCT = Color(-16756225)
+        val ENUM = Color(-2490113)
+        val FUNCTION = Color(-842752)
+        val MODULE = Color(-10066330)
+        val INTERFACE = Color(-16521928)
     }
 }

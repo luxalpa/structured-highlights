@@ -31,7 +31,7 @@ enum class TomlBlockType(
     override val label: String,
     override val defaultColor: Color,
 ) : BlockType {
-    TABLE("Table", Color(0x235AFF));
+    TABLE("Table", DefaultColor.STRUCT);
 
     override val key: String get() = "LUX_SH_TOML_BG_$name"
     override val colorKey: ColorKey = ColorKey.createColorKey(key, defaultColor)

@@ -21,9 +21,9 @@ class LxConfigurable : Configurable, Configurable.NoScroll, Configurable.NoMargi
     override fun getDisplayName(): @NlsContexts.ConfigurableName String = MyBundle.message("pluginName")
 
     override fun createComponent(): JComponent {
-//        com.intellij.lang.Language.getRegisteredLanguages()
-//            .sortedBy { it.id }
-//            .forEach { LOGGER.warn("${it.id} | ${it.displayName}") }
+        com.intellij.lang.Language.getRegisteredLanguages()
+            .sortedBy { it.id }
+            .forEach { LOGGER.warn("${it.id} | ${it.displayName}") }
 
         mySettingsComponent = AppSettingsComponent()
         return mySettingsComponent!!.getPanel()

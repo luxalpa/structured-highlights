@@ -22,7 +22,11 @@ data class DefinitionBlockDescriptor(
     val startOffset: Int,
     val endOffset: Int,
     val blockType: BlockType,
+
+    // Currently unused, might be reenabled later though.
+    // This is the block type it would be if it wasn't overridden by the higher-level block.
     val actualType: BlockType,
+
     val kind: Kind = Kind.Block,
     val mode: Mode = Mode.FULL_LINE
 )

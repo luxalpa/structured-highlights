@@ -4,6 +4,11 @@
 
 ## [Unreleased]
 
+- Color `macro_rules` definitions
+- Improve coloring for trait functions without bodies.
+- Add support for TOML
+- Add support for Kotlin
+
 ## [1.0.2] - 2026-08-21
 
 - Fixed compatibility with 2026.2.2 eap (one of the classes was marked as internal)
