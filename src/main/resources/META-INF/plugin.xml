@@ -6,6 +6,7 @@
 
     <depends>com.intellij.modules.platform</depends>
     <depends optional="true" config-file="myplugin-rust.xml">com.jetbrains.rust</depends>
+    <depends optional="true" config-file="myplugin-toml.xml">org.toml.lang</depends>
 
     <resource-bundle>messages.MyBundle</resource-bundle>
 

@@ -2,14 +2,12 @@ package com.luxalpa.structuredhighlights.languages
 
 import com.intellij.openapi.editor.colors.ColorKey
 import com.intellij.psi.PsiFile
-import com.intellij.psi.util.endOffset
-import com.intellij.psi.util.startOffset
 import com.luxalpa.structuredhighlights.BlockType
 import com.luxalpa.structuredhighlights.DefinitionBlockDescriptor
 import com.luxalpa.structuredhighlights.Descriptor
 import com.luxalpa.structuredhighlights.Kind
 import com.luxalpa.structuredhighlights.LanguageSupport
-import com.luxalpa.structuredhighlights.Mode
+import org.intellij.lang.annotations.Language
 import org.rust.lang.core.psi.RsEnumItem
 import org.rust.lang.core.psi.RsFile
 import org.rust.lang.core.psi.RsFunction
@@ -25,7 +23,7 @@ class Rust : LanguageSupport {
         val file = file as? RsFile ?: return null
         val visitor = RustVisitor()
         file.accept(visitor)
-        return visitor.definitions
+        return visitor.collector.definitions
     }
 
     override val blockTypes: List<BlockType> = RsBlockType.entries.toList()
@@ -49,43 +47,8 @@ enum class RsBlockType(
     override val colorKey: ColorKey = ColorKey.createColorKey(key, defaultColor)
 }
 
-
 class RustVisitor : RsRecursiveVisitor() {
-    val definitions = mutableListOf<DefinitionBlockDescriptor>()
-
-    var curBlockType: BlockType? = null
-
-    private fun handleBlockType(
-        defaultType: BlockType,
-        descriptors: List<Descriptor>,
-        useForChildren: Boolean = true,
-        visit: () -> Unit
-    ) {
-        val isTopLevel = curBlockType == null
-        val newBlockType = curBlockType ?: defaultType
-        if (useForChildren) {
-            curBlockType = newBlockType
-        }
-
-        for (descriptor in descriptors) {
-            val mode = when (descriptor.kind) {
-                Kind.Block, Kind.Header, Kind.Subheader -> Mode.FULL_LINE
-                Kind.Identifier -> Mode.EXACT_RANGE
-            }
-
-            definitions += DefinitionBlockDescriptor(
-                descriptor.element.startOffset,
-                descriptor.element.endOffset,
-                newBlockType,
-                defaultType,
-                descriptor.kind,
-                mode
-            )
-        }
-
-        visit()
-        if (isTopLevel) curBlockType = null
-    }
+    val collector = BlockCollector()
 
     override fun visitStructItem(o: RsStructItem) {
         val descriptors = buildList {
@@ -96,7 +59,7 @@ class RustVisitor : RsRecursiveVisitor() {
             }
         }
 
-        handleBlockType(RsBlockType.STRUCT, descriptors) {
+        collector.collect(RsBlockType.STRUCT, descriptors) {
             super.visitStructItem(o)
         }
     }
@@ -113,25 +76,24 @@ class RustVisitor : RsRecursiveVisitor() {
             }
         }
 
-        handleBlockType(RsBlockType.IMPL, descriptors) {
+        collector.collect(RsBlockType.IMPL, descriptors) {
             super.visitImplItem(o)
         }
     }
 
     override fun visitFunction(o: RsFunction) {
-        val isTopLevel = curBlockType == null
         val descriptors = buildList {
             // Currently, we don't allow blocks inside blocks due to performance issues.
-            if (isTopLevel) {
+            if (collector.isTopLevel) {
                 add(Descriptor(Kind.Block, o))
             }
             o.identifier.let {
-                add(Descriptor(if (isTopLevel) Kind.Header else Kind.Subheader, it))
+                add(Descriptor(if (collector.isTopLevel) Kind.Header else Kind.Subheader, it))
                 add(Descriptor(Kind.Identifier, it))
             }
         }
 
-        handleBlockType(RsBlockType.FUNCTION, descriptors) {
+        collector.collect(RsBlockType.FUNCTION, descriptors) {
             super.visitFunction(o)
         }
     }
@@ -147,7 +109,7 @@ class RustVisitor : RsRecursiveVisitor() {
             }
         }
 
-        handleBlockType(RsBlockType.MODULE, descriptors, false) {
+        collector.collect(RsBlockType.MODULE, descriptors, false) {
             super.visitModItem(o)
         }
     }
@@ -161,7 +123,7 @@ class RustVisitor : RsRecursiveVisitor() {
             }
         }
 
-        handleBlockType(RsBlockType.TRAIT, descriptors) {
+        collector.collect(RsBlockType.TRAIT, descriptors) {
             super.visitTraitItem(o)
         }
     }
@@ -175,14 +137,14 @@ class RustVisitor : RsRecursiveVisitor() {
             }
         }
 
-        handleBlockType(RsBlockType.ENUM, descriptors) {
+        collector.collect(RsBlockType.ENUM, descriptors) {
             super.visitEnumItem(o)
         }
     }
 }
 
-
-val PREVIEW_TEXT = """
+@Language("Rust")
+private val PREVIEW_TEXT = """
     trait Terrible {
         fn breathe_fire(&self);
         fn devour(&self, num_people: usize);

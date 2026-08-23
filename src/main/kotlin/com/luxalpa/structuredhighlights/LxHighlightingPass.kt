@@ -28,7 +28,16 @@ data class DefinitionBlockDescriptor(
 )
 
 enum class Kind {
-    Block, Header, Subheader, Identifier
+    Block, Header, Subheader, Identifier;
+
+    // The renderer draws these from high to low for some reason.
+    val layer: Int
+        get() = when (this) {
+            Block -> 2
+            Header -> 1
+            Subheader -> 1
+            Identifier -> 0
+        }
 }
 
 data class Descriptor(val kind: Kind, val element: PsiElement)
@@ -85,34 +94,38 @@ class LxHighlightingPass(
         val settings = editor.getUserData(LUX_PREVIEW_SETTINGS) ?: LxApplicationSettings.instance
 
         for (descriptor in descriptors) {
-            val highlighter = if (descriptor.mode == Mode.EXACT_RANGE) {
-                markupModel.addRangeHighlighter(
-                    descriptor.startOffset,
-                    descriptor.endOffset,
-                    HighlighterLayer.GUARDED_BLOCKS + 1,
-                    null,
-                    HighlighterTargetArea.EXACT_RANGE
-                ).apply {
-                    customRenderer = LxExactRangeHighlightingRenderer(
-                        descriptor.blockType,
-                        descriptor.kind,
-                        settings
-                    )
+            val highlighter = when (descriptor.mode) {
+                Mode.EXACT_RANGE -> {
+                    markupModel.addRangeHighlighter(
+                        descriptor.startOffset,
+                        descriptor.endOffset,
+                        descriptor.kind.layer,
+                        null,
+                        HighlighterTargetArea.EXACT_RANGE
+                    ).apply {
+                        customRenderer = LxExactRangeHighlightingRenderer(
+                            descriptor.blockType,
+                            descriptor.kind,
+                            settings
+                        )
+                    }
                 }
-            } else {
-                val highlighter = markupModel.addRangeHighlighter(
-                    descriptor.startOffset,
-                    descriptor.endOffset,
-                    -1,
-                    null,
-                    HighlighterTargetArea.LINES_IN_RANGE
-                )
 
-                highlighter.customRenderer = LxHighlightingRenderer(
-                    descriptor.blockType, descriptor.kind, settings
-                )
+                Mode.FULL_LINE -> {
+                    val highlighter = markupModel.addRangeHighlighter(
+                        descriptor.startOffset,
+                        descriptor.endOffset,
+                        descriptor.kind.layer,
+                        null,
+                        HighlighterTargetArea.LINES_IN_RANGE
+                    )
 
-                highlighter
+                    highlighter.customRenderer = LxHighlightingRenderer(
+                        descriptor.blockType, descriptor.kind, settings
+                    )
+
+                    highlighter
+                }
             }
 
             newHighlighters.add(highlighter)
