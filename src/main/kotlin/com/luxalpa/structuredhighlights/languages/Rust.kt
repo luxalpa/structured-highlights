@@ -12,6 +12,7 @@ import org.rust.lang.core.psi.RsEnumItem
 import org.rust.lang.core.psi.RsFile
 import org.rust.lang.core.psi.RsFunction
 import org.rust.lang.core.psi.RsImplItem
+import org.rust.lang.core.psi.RsMacro
 import org.rust.lang.core.psi.RsModItem
 import org.rust.lang.core.psi.RsRecursiveVisitor
 import org.rust.lang.core.psi.RsStructItem
@@ -41,7 +42,8 @@ enum class RsBlockType(
     TRAIT("Trait", Color(-16521928)),
     IMPL("Impl", Color(-20992)),
     FUNCTION("Function", Color(-842752)),
-    MODULE("Module", Color(-10066330));
+    MODULE("Module", Color(-10066330)),
+    MACRORULES("Macro Definition", Color(-10066330));
 
     override val key: String get() = "LUX_SH_RUST_BG_$name"
     override val colorKey: ColorKey = ColorKey.createColorKey(key, defaultColor)
@@ -141,6 +143,20 @@ class RustVisitor : RsRecursiveVisitor() {
             super.visitEnumItem(o)
         }
     }
+
+    override fun visitMacro(o: RsMacro) {
+        val descriptors = buildList {
+            add(Descriptor(Kind.Block, o))
+            o.nameIdentifier?.let {
+                add(Descriptor(Kind.Header, it))
+                add(Descriptor(Kind.Identifier, it))
+            }
+        }
+
+        collector.collect(RsBlockType.MACRORULES, descriptors) {
+            super.visitMacro(o)
+        }
+    }
 }
 
 @Language("Rust")
@@ -180,6 +196,15 @@ private val PREVIEW_TEXT = """
         Wings,
         Teeth(usize),
         Fire,
+    }
+    
+    macro_rules! build_dragon {
+        () => {
+            Dragon {
+                name: "Smaug".to_string(),
+                age: 7000.0,
+            }
+        };
     }
 
     #[cfg(test)]
