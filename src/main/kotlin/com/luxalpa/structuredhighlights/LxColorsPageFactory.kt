@@ -137,6 +137,7 @@ class LxPreviewPanel(options: ColorAndFontOptions) : PreviewPanel {
         val support = supportFor(desc) ?: return
 
         if (support === currentSupport) return
+        currentSupport = support
 
         val openProjects = ProjectManager.getInstance().openProjects
         val project = if (openProjects.isNotEmpty()) openProjects[0] else ProjectManager.getInstance().defaultProject
