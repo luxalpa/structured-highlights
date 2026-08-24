@@ -12,8 +12,10 @@ tasks.runIde {
 
 dependencies {
     intellijPlatform {
-//        rustRover("2025.2")
-        intellijIdea("2025.2")
+        rustRover("2025.2")
+//        phpstorm("2025.2")
+//        intellijIdea("2025.2")
+//        rider("2025.2")
 
         // Plugin Dependencies -> https://plugins.jetbrains.com/docs/intellij/plugin-dependencies.html
         plugins("com.jetbrains.rust:252.23892.452")

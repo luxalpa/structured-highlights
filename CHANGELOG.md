@@ -11,6 +11,7 @@
     - Kotlin
     - Java
     - PHP
+    - C# (Rider)
 
 ## [1.0.2] - 2026-08-21
 
