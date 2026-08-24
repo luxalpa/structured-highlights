@@ -18,12 +18,17 @@ dependencies {
 //        rider("2025.2")
 
         // Plugin Dependencies -> https://plugins.jetbrains.com/docs/intellij/plugin-dependencies.html
-        plugins("com.jetbrains.rust:252.23892.452")
-        plugins("org.jetbrains.kotlin:252.28539.97-IJ")
-        plugins("com.intellij.java:252.23892.409")
-        plugins("com.jetbrains.php:252.23892.458")
-//        bundledPlugin("com.jetbrains.rust")
-        plugins("org.toml.lang:252.28238.9")
+        plugins(
+            "com.jetbrains.rust:252.23892.452",
+            "org.jetbrains.kotlin:252.28539.97-IJ",
+            "com.intellij.java:252.23892.409",
+            "com.jetbrains.php:252.23892.458",
+            "org.toml.lang:252.28238.9",
+            "dev.blachut.svelte.lang:252.23892.298"
+        )
+//        plugins("JavaScript:252.23892.452")
+
+        bundledPlugin("JavaScript")
     }
 }
 
