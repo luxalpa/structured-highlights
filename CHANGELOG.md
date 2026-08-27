@@ -15,6 +15,7 @@
     - JavaScript
     - TypeScript
     - CSS
+    - SCSS
 
 ## [1.0.2] - 2026-08-21
 
