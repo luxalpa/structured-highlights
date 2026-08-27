@@ -20,7 +20,7 @@ class BlockCollector {
         defaultType: BlockType,
         descriptors: List<Descriptor>,
         useForChildren: Boolean = true,
-        visit: () -> Unit
+        visit: () -> Unit = {}
     ) {
         val isTopLevel = curBlockType == null
         val newBlockType = curBlockType ?: defaultType

@@ -24,7 +24,8 @@ dependencies {
             "com.intellij.java:252.23892.409",
             "com.jetbrains.php:252.23892.458",
             "org.toml.lang:252.28238.9",
-            "dev.blachut.svelte.lang:252.23892.298"
+            "dev.blachut.svelte.lang:252.23892.298",
+            "com.intellij.css:252.27397.28"
         )
 //        plugins("JavaScript:252.23892.452")
 

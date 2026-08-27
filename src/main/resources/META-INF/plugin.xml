@@ -12,6 +12,7 @@
     <depends optional="true" config-file="myplugin-php.xml">com.jetbrains.php</depends>
     <depends optional="true" config-file="myplugin-csharp.xml">com.intellij.modules.rider</depends>
     <depends optional="true" config-file="myplugin-javascript.xml">JavaScript</depends>
+    <depends optional="true" config-file="myplugin-css.xml">com.intellij.css</depends>
     <!--    <depends optional="true" config-file="myplugin-svelte.xml">dev.blachut.svelte.lang</depends>-->
     <extensions defaultExtensionNs="org.jetbrains.kotlin">
         <supportsKotlinPluginMode supportsK2="true"/>

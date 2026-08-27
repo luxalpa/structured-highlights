@@ -42,7 +42,7 @@ class JavaScript : LanguageSupport {
                         }
                     }
 
-                    collector.collect(TsBlockType.FUNCTION, descriptors) {}
+                    collector.collect(TsBlockType.FUNCTION, descriptors)
                 }
 
                 is JSVarStatement -> {
@@ -57,7 +57,7 @@ class JavaScript : LanguageSupport {
                                 }
                             }
 
-                            collector.collect(TsBlockType.FUNCTION, descriptors) {}
+                            collector.collect(TsBlockType.FUNCTION, descriptors)
                         }
                     }
                 }
@@ -80,7 +80,7 @@ class JavaScript : LanguageSupport {
                                 }
                             }
 
-                            collector.collect(TsBlockType.FUNCTION, descriptors) {}
+                            collector.collect(TsBlockType.FUNCTION, descriptors)
                         }
                     }
                 }
@@ -94,7 +94,7 @@ class JavaScript : LanguageSupport {
                         }
                     }
 
-                    collector.collect(TsBlockType.INTERFACE, descriptors) {}
+                    collector.collect(TsBlockType.INTERFACE, descriptors)
                 }
 
                 is TypeScriptTypeAlias -> {
@@ -114,7 +114,7 @@ class JavaScript : LanguageSupport {
                             }
                         }
 
-                        collector.collect(TsBlockType.TYPEDECL, descriptors) {}
+                        collector.collect(TsBlockType.TYPEDECL, descriptors)
                     }
                 }
             }
@@ -149,9 +149,9 @@ private val PREVIEW_TEXT = """
     }
     
     type Wyvern = {
-        name: string    
+        name: string
     }
-        
+    
     class Dragon implements Wyvern {
         name: string;
     }
