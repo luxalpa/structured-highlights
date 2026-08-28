@@ -13,12 +13,12 @@ interface LanguageSupport {
             "com.luxalpa.structuredhighlights.languageSupport"
         )
     }
-    
-    fun collectDescriptors(file: PsiFile): List<DefinitionBlockDescriptor>?
-    val blockTypes: List<BlockType>
-    val displayName: String
+
     val languageId: String
+    val displayName: String
     val previewText: String
+    val blockTypes: List<BlockType>
+    fun collectDescriptors(file: PsiFile): List<DefinitionBlockDescriptor>?
 }
 
 interface BlockType {

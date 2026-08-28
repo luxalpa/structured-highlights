@@ -53,31 +53,16 @@ class KotlinVisitor : KtTreeVisitorVoid() {
             return
         }
 
-        val descriptors = buildList {
-            add(Descriptor(Kind.Block, o))
-            o.nameIdentifier?.let {
-                add(Descriptor(Kind.Header, it))
-                add(Descriptor(Kind.Identifier, it))
-            }
-        }
+        val type =
+            if (o.isEnum()) KtBlockType.ENUM else if (o.isInterface()) KtBlockType.INTERFACE else KtBlockType.CLASS
 
-        collector.collect(
-            if (o.isEnum()) KtBlockType.ENUM else if (o.isInterface()) KtBlockType.INTERFACE else KtBlockType.CLASS,
-            descriptors
-        ) {
+        collector.collectBlock(type, o, o.nameIdentifier) {
             super.visitClass(o)
         }
     }
 
     override fun visitObjectDeclaration(o: KtObjectDeclaration) {
-        val descriptors = buildList {
-            add(Descriptor(Kind.Block, o))
-            o.nameIdentifier?.let {
-                add(Descriptor(Kind.Header, it))
-                add(Descriptor(Kind.Identifier, it))
-            }
-        }
-        collector.collect(KtBlockType.OBJECT, descriptors) {
+        collector.collectBlock(KtBlockType.OBJECT, o, o.nameIdentifier) {
             super.visitObjectDeclaration(o)
         }
     }
@@ -88,14 +73,7 @@ class KotlinVisitor : KtTreeVisitorVoid() {
             return
         }
 
-        val descriptors = buildList {
-            add(Descriptor(Kind.Block, o))
-            o.nameIdentifier?.let {
-                add(Descriptor(if (collector.isTopLevel) Kind.Header else Kind.Subheader, it))
-                add(Descriptor(Kind.Identifier, it))
-            }
-        }
-        collector.collect(KtBlockType.FUNCTION, descriptors) {
+        collector.collectBlock(KtBlockType.FUNCTION, o, o.nameIdentifier) {
             super.visitNamedFunction(o)
         }
     }

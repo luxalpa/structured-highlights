@@ -14,17 +14,17 @@ import org.toml.lang.psi.TomlTable
 import java.awt.Color
 
 class Toml : LanguageSupport {
+    override val languageId: String = "TOML"
+    override val displayName: String = "TOML"
+    override val previewText: String = PREVIEW_TEXT
+    override val blockTypes: List<BlockType> = TomlBlockType.entries
+
     override fun collectDescriptors(file: PsiFile): List<DefinitionBlockDescriptor>? {
         val file = file as? TomlFile ?: return null
         val visitor = TomlVisitor()
         file.accept(visitor)
         return visitor.collector.definitions
     }
-
-    override val blockTypes: List<BlockType> = TomlBlockType.entries.toList()
-    override val displayName: String = "TOML"
-    override val languageId: String = "TOML"
-    override val previewText: String = PREVIEW_TEXT
 }
 
 enum class TomlBlockType(

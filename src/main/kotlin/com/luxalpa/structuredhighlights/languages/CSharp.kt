@@ -66,27 +66,13 @@ class CSharpVisitor : PsiRecursiveElementVisitor() {
     }
 
     private fun visitType(element: PsiElement, blockType: CSharpBlockType) {
-        val descriptors = buildList {
-            add(Descriptor(Kind.Block, element))
-            nameElement(element)?.let {
-                add(Descriptor(Kind.Header, it))
-                add(Descriptor(Kind.Identifier, it))
-            }
-        }
-        collector.collect(blockType, descriptors) {
+        collector.collectBlock(blockType, element, nameElement(element)) {
             super.visitElement(element)
         }
     }
 
     private fun visitNamespace(element: PsiElement) {
-        val descriptors = buildList {
-            add(Descriptor(Kind.Block, element))
-            nameElement(element)?.let {
-                add(Descriptor(Kind.Header, it))
-                add(Descriptor(Kind.Identifier, it))
-            }
-        }
-        collector.collect(CSharpBlockType.NAMESPACE, descriptors, useForChildren = false) {
+        collector.collectBlock(CSharpBlockType.NAMESPACE, element, nameElement(element), useForChildren = false) {
             super.visitElement(element)
         }
     }

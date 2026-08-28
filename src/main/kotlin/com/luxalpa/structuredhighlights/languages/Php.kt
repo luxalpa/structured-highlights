@@ -56,14 +56,11 @@ class PhpVisitor : PhpElementVisitor() {
     }
 
     override fun visitPhpNamespace(namespace: PhpNamespace) {
-        val descriptors = buildList {
-            add(Descriptor(Kind.Block, namespace))
-            namespace.nameIdentifier?.let {
-                add(Descriptor(Kind.Header, it))
-                add(Descriptor(Kind.Identifier, it))
-            }
-        }
-        collector.collect(PhpBlockType.NAMESPACE, descriptors, useForChildren = false) {
+        collector.collectBlock(
+            PhpBlockType.NAMESPACE,
+            namespace, namespace.nameIdentifier,
+            useForChildren = false
+        ) {
             super.visitPhpNamespace(namespace)
         }
     }
@@ -74,14 +71,6 @@ class PhpVisitor : PhpElementVisitor() {
             return
         }
 
-        val descriptors = buildList {
-            add(Descriptor(Kind.Block, phpClass))
-            phpClass.nameIdentifier?.let {
-                add(Descriptor(Kind.Header, it))
-                add(Descriptor(Kind.Identifier, it))
-            }
-        }
-
         val blockType = when {
             phpClass.isTrait -> PhpBlockType.TRAIT
             phpClass.isEnum -> PhpBlockType.ENUM
@@ -89,7 +78,7 @@ class PhpVisitor : PhpElementVisitor() {
             else -> PhpBlockType.CLASS
         }
 
-        collector.collect(blockType, descriptors) {
+        collector.collectBlock(blockType, phpClass, phpClass.nameIdentifier) {
             super.visitPhpClass(phpClass)
         }
     }
@@ -121,14 +110,7 @@ class PhpVisitor : PhpElementVisitor() {
             return
         }
 
-        val descriptors = buildList {
-            add(Descriptor(Kind.Block, function))
-            function.nameIdentifier?.let {
-                add(Descriptor(if (collector.isTopLevel) Kind.Header else Kind.Subheader, it))
-                add(Descriptor(Kind.Identifier, it))
-            }
-        }
-        collector.collect(PhpBlockType.FUNCTION, descriptors) {
+        collector.collectBlock(PhpBlockType.FUNCTION, function, function.nameIdentifier) {
             super.visitPhpFunction(function)
         }
     }

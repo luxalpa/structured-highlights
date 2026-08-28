@@ -2,7 +2,7 @@ package com.luxalpa.structuredhighlights.languages
 
 import com.intellij.openapi.editor.colors.ColorKey
 import com.intellij.psi.PsiFile
-import com.intellij.psi.css.CssFile
+import com.intellij.psi.css.CssKeyframesRule
 import com.intellij.psi.css.CssMedia
 import com.intellij.psi.css.CssRuleset
 import com.luxalpa.structuredhighlights.BlockType
@@ -29,52 +29,16 @@ class Scss : LanguageSupport {
 
         file.stylesheet.rulesetList.children.forEach { child ->
             when (child) {
-                is CssRuleset -> {
-                    val descriptors = buildList {
-                        add(Descriptor(Kind.Block, child))
-                        child.selectorList?.let {
-                            add(Descriptor(Kind.Header, it))
-                            add(Descriptor(Kind.Identifier, it))
-                        }
-                    }
-
-                    collector.collect(ScssBlockType.RULESET, descriptors)
-                }
-
-                is CssMedia -> {
-                    val descriptors = buildList {
-                        add(Descriptor(Kind.Block, child))
-                        child.mediumList?.let {
-                            add(Descriptor(Kind.Header, it))
-                            add(Descriptor(Kind.Identifier, it))
-                        }
-                    }
-
-                    collector.collect(ScssBlockType.MEDIA, descriptors)
-                }
-
                 is SCSSMixinDeclaration -> {
-                    val descriptors = buildList {
-                        add(Descriptor(Kind.Block, child))
-                        child.nameIdentifier?.let {
-                            add(Descriptor(Kind.Header, it))
-                            add(Descriptor(Kind.Identifier, it))
-                        }
-                    }
-
-                    collector.collect(ScssBlockType.MIXIN, descriptors)
+                    collector.collectBlock(ScssBlockType.MIXIN, child, child.nameIdentifier)
                 }
 
                 is SassScssFunctionDeclaration -> {
-                    val descriptors = buildList {
-                        add(Descriptor(Kind.Block, child))
-                        child.nameIdentifier?.let {
-                            add(Descriptor(Kind.Header, it))
-                            add(Descriptor(Kind.Identifier, it))
-                        }
-                    }
-
-                    collector.collect(ScssBlockType.FUNCTION, descriptors)
+                    collector.collectBlock(ScssBlockType.FUNCTION, child, child.nameIdentifier)
+                }
+                
+                else -> {
+                    collector.collectCssChild(child)
                 }
             }
         }
@@ -87,8 +51,6 @@ enum class ScssBlockType(
     override val label: String,
     override val defaultColor: Color,
 ) : BlockType {
-    RULESET("Ruleset", DefaultColor.STRUCT),
-    MEDIA("Media Query", DefaultColor.STRUCT),
     MIXIN("Mixin", DefaultColor.CLASS),
     FUNCTION("Function", DefaultColor.FUNCTION);
 

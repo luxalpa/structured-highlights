@@ -1,5 +1,6 @@
 package com.luxalpa.structuredhighlights.languages
 
+import com.intellij.psi.PsiElement
 import com.intellij.psi.util.endOffset
 import com.intellij.psi.util.startOffset
 import com.luxalpa.structuredhighlights.BlockType
@@ -7,6 +8,7 @@ import com.luxalpa.structuredhighlights.DefinitionBlockDescriptor
 import com.luxalpa.structuredhighlights.Descriptor
 import com.luxalpa.structuredhighlights.Kind
 import com.luxalpa.structuredhighlights.Mode
+import org.rust.openapiext.document
 import java.awt.Color
 
 // For handling nesting.
@@ -47,6 +49,29 @@ class BlockCollector {
         visit()
         if (isTopLevel) curBlockType = null
     }
+
+    fun collectBlock(
+        type: BlockType,
+        block: PsiElement? = null,
+        name: PsiElement? = null,
+        headerKind: Kind = if (isTopLevel) Kind.Header else Kind.Subheader,
+        useForChildren: Boolean = true,
+        visit: () -> Unit = {}
+    ) = collect(type, buildList {
+        block?.let { add(Descriptor(Kind.Block, it)) }
+        name?.let {
+            add(Descriptor(headerKind, it))
+            add(Descriptor(Kind.Identifier, it))
+        }
+    }, useForChildren, visit)
+}
+
+fun lineSpan(element: PsiElement): Int {
+    val document = element.containingFile.document ?: return 0
+    val range = element.textRange
+    val startLine = document.getLineNumber(range.startOffset)
+    val endLine = document.getLineNumber(range.endOffset.coerceAtMost(document.textLength))
+    return endLine - startLine + 1
 }
 
 class DefaultColor {

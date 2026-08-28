@@ -1,4 +1,5 @@
 <idea-plugin>
+    <depends>com.intellij.css</depends>
     <extensions defaultExtensionNs="com.luxalpa.structuredhighlights">
         <languageSupport implementation="com.luxalpa.structuredhighlights.languages.Scss"/>
     </extensions>

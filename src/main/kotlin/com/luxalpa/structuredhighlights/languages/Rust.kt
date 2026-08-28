@@ -54,15 +54,7 @@ class RustVisitor : RsRecursiveVisitor() {
     val collector = BlockCollector()
 
     override fun visitStructItem(o: RsStructItem) {
-        val descriptors = buildList {
-            add(Descriptor(Kind.Block, o))
-            o.identifier?.let {
-                add(Descriptor(Kind.Header, it))
-                add(Descriptor(Kind.Identifier, it))
-            }
-        }
-
-        collector.collect(RsBlockType.STRUCT, descriptors) {
+        collector.collectBlock(RsBlockType.STRUCT, o, o.identifier) {
             super.visitStructItem(o)
         }
     }
@@ -117,49 +109,25 @@ class RustVisitor : RsRecursiveVisitor() {
             }
         }
 
-        collector.collect(RsBlockType.MODULE, descriptors, false) {
+        collector.collectBlock(RsBlockType.MODULE, o, o.identifier, useForChildren = false) {
             super.visitModItem(o)
         }
     }
 
     override fun visitTraitItem(o: RsTraitItem) {
-        val descriptors = buildList {
-            add(Descriptor(Kind.Block, o))
-            o.identifier?.let {
-                add(Descriptor(Kind.Header, it))
-                add(Descriptor(Kind.Identifier, it))
-            }
-        }
-
-        collector.collect(RsBlockType.TRAIT, descriptors) {
+        collector.collectBlock(RsBlockType.TRAIT, o, o.identifier) {
             super.visitTraitItem(o)
         }
     }
 
     override fun visitEnumItem(o: RsEnumItem) {
-        val descriptors = buildList {
-            add(Descriptor(Kind.Block, o))
-            o.identifier?.let {
-                add(Descriptor(Kind.Header, it))
-                add(Descriptor(Kind.Identifier, it))
-            }
-        }
-
-        collector.collect(RsBlockType.ENUM, descriptors) {
+        collector.collectBlock(RsBlockType.ENUM, o, o.identifier) {
             super.visitEnumItem(o)
         }
     }
 
     override fun visitMacro(o: RsMacro) {
-        val descriptors = buildList {
-            add(Descriptor(Kind.Block, o))
-            o.nameIdentifier?.let {
-                add(Descriptor(Kind.Header, it))
-                add(Descriptor(Kind.Identifier, it))
-            }
-        }
-
-        collector.collect(RsBlockType.MACRORULES, descriptors) {
+        collector.collectBlock(RsBlockType.MACRORULES, o, o.nameIdentifier) {
             super.visitMacro(o)
         }
     }

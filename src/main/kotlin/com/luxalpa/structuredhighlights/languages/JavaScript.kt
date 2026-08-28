@@ -34,44 +34,20 @@ class JavaScript : LanguageSupport {
         file.statements.forEach { statement ->
             when (statement) {
                 is JSFunction -> {
-                    val descriptors = buildList {
-                        add(Descriptor(Kind.Block, statement))
-                        statement.nameIdentifier?.let {
-                            add(Descriptor(Kind.Header, it))
-                            add(Descriptor(Kind.Identifier, it))
-                        }
-                    }
-
-                    collector.collect(TsBlockType.FUNCTION, descriptors)
+                    collector.collectBlock(TsBlockType.FUNCTION, statement, statement.nameIdentifier)
                 }
 
                 is JSVarStatement -> {
                     statement.declarations.forEach { declaration ->
                         if (declaration !is JSVariable) return@forEach
                         (declaration.initializer as? JSFunctionExpression)?.let {
-                            val descriptors = buildList {
-                                add(Descriptor(Kind.Block, statement))
-                                declaration.nameIdentifier?.let {
-                                    add(Descriptor(Kind.Header, it))
-                                    add(Descriptor(Kind.Identifier, it))
-                                }
-                            }
-
-                            collector.collect(TsBlockType.FUNCTION, descriptors)
+                            collector.collectBlock(TsBlockType.FUNCTION, statement, declaration.nameIdentifier)
                         }
                     }
                 }
 
                 is ES6Class, is TypeScriptClass -> {
-                    val descriptors = buildList {
-                        add(Descriptor(Kind.Block, statement))
-                        statement.nameIdentifier?.let {
-                            add(Descriptor(Kind.Header, it))
-                            add(Descriptor(Kind.Identifier, it))
-                        }
-                    }
-
-                    collector.collect(TsBlockType.CLASS, descriptors) {
+                    collector.collectBlock(TsBlockType.CLASS, statement, statement.nameIdentifier) {
                         statement.functions.forEach { f ->
                             val descriptors = buildList {
                                 f.nameIdentifier?.let {
@@ -86,35 +62,14 @@ class JavaScript : LanguageSupport {
                 }
 
                 is TypeScriptInterface -> {
-                    val descriptors = buildList {
-                        add(Descriptor(Kind.Block, statement))
-                        statement.nameIdentifier?.let {
-                            add(Descriptor(Kind.Header, it))
-                            add(Descriptor(Kind.Identifier, it))
-                        }
-                    }
-
-                    collector.collect(TsBlockType.INTERFACE, descriptors)
+                    collector.collectBlock(TsBlockType.INTERFACE, statement, statement.nameIdentifier)
                 }
 
                 is TypeScriptTypeAlias -> {
                     statement.typeDeclaration?.let { typeDecl ->
-                        val document = typeDecl.containingFile.document ?: return@let
-                        val range = typeDecl.textRange
-                        val startLine = document.getLineNumber(range.startOffset)
-                        val endLine = document.getLineNumber(range.endOffset.coerceAtMost(document.textLength))
-                        val lineSpan = endLine - startLine + 1
-                        if (lineSpan <= 2)
+                        if (lineSpan(typeDecl) <= 2)
                             return@let
-                        val descriptors = buildList {
-                            add(Descriptor(Kind.Block, statement))
-                            statement.nameIdentifier?.let {
-                                add(Descriptor(Kind.Header, it))
-                                add(Descriptor(Kind.Identifier, it))
-                            }
-                        }
-
-                        collector.collect(TsBlockType.TYPEDECL, descriptors)
+                        collector.collectBlock(TsBlockType.TYPEDECL, statement, statement.nameIdentifier)
                     }
                 }
             }

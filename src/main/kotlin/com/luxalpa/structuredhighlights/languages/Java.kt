@@ -46,14 +46,6 @@ class JavaVisitor : JavaRecursiveElementVisitor() {
     val collector = BlockCollector()
 
     override fun visitClass(o: PsiClass) {
-        val descriptors = buildList {
-            add(Descriptor(Kind.Block, o))
-            o.nameIdentifier?.let {
-                add(Descriptor(Kind.Header, it))
-                add(Descriptor(Kind.Identifier, it))
-            }
-        }
-
         val blockType = if (o.isAnnotationType) {
             JavaBlockType.ANNOTATION
         } else if (o.isEnum) {
@@ -64,10 +56,7 @@ class JavaVisitor : JavaRecursiveElementVisitor() {
             JavaBlockType.CLASS
         }
 
-        collector.collect(
-            blockType,
-            descriptors
-        ) {
+        collector.collectBlock(blockType, o, o.nameIdentifier) {
             super.visitClass(o)
         }
     }
