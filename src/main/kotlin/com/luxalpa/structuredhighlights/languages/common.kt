@@ -8,7 +8,6 @@ import com.luxalpa.structuredhighlights.DefinitionBlockDescriptor
 import com.luxalpa.structuredhighlights.Descriptor
 import com.luxalpa.structuredhighlights.Kind
 import com.luxalpa.structuredhighlights.Mode
-import org.rust.openapiext.document
 import java.awt.Color
 
 // For handling nesting.
@@ -67,7 +66,7 @@ class BlockCollector {
 }
 
 fun lineSpan(element: PsiElement): Int {
-    val document = element.containingFile.document ?: return 0
+    val document = element.containingFile.viewProvider.document ?: return 0
     val range = element.textRange
     val startLine = document.getLineNumber(range.startOffset)
     val endLine = document.getLineNumber(range.endOffset.coerceAtMost(document.textLength))

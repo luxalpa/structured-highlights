@@ -10,28 +10,41 @@ tasks.runIde {
     jvmArgs("-Didea.log.debug.categories=StructuredHighlights")
 }
 
+subprojects {
+    apply(plugin = "org.jetbrains.kotlin.jvm")
+    apply(plugin = "org.jetbrains.intellij.platform.module")
+
+    java {
+        toolchain {
+            languageVersion.set(JavaLanguageVersion.of(23))
+        }
+    }
+}
+
 dependencies {
     intellijPlatform {
-        rustRover("2025.2")
+        rustRover("2026.2")
 //        phpstorm("2025.2")
 //        intellijIdea("2025.2")
 //        rider("2025.2")
 
         // Plugin Dependencies -> https://plugins.jetbrains.com/docs/intellij/plugin-dependencies.html
-        plugins(
-            "com.jetbrains.rust:252.23892.452",
-            "org.jetbrains.kotlin:252.28539.97-IJ",
-            "com.intellij.java:252.23892.409",
-            "com.jetbrains.php:252.23892.458",
-            "org.toml.lang:252.28238.9",
-            "dev.blachut.svelte.lang:252.23892.298",
-            "com.intellij.css:252.27397.28",
-            "org.jetbrains.plugins.sass:252.23892.358",
-        )
+//        plugins(
+//            "com.jetbrains.rust:252.23892.452",
+//            "org.jetbrains.kotlin:252.28539.97-IJ",
+//            "com.intellij.java:252.23892.409",
+//            "com.jetbrains.php:252.23892.458",
+//            "org.toml.lang:252.28238.9",
+//            "dev.blachut.svelte.lang:252.23892.298",
+//            "com.intellij.css:252.27397.28",
+//            "org.jetbrains.plugins.sass:252.23892.358",
+//        )
 //        plugins("JavaScript:252.23892.452")
 
-        bundledPlugin("JavaScript")
+//        bundledPlugin("JavaScript")
     }
+    implementation(project(":shared"))
+    implementation(project(":lang-cpp"))
 }
 
 tasks.patchPluginXml {
