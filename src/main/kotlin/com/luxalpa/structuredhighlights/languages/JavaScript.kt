@@ -11,11 +11,11 @@
 //import com.intellij.lang.javascript.psi.ecma6.TypeScriptTypeAlias
 //import com.intellij.openapi.editor.colors.ColorKey
 //import com.intellij.psi.PsiFile
-//import com.luxalpa.structuredhighlights.BlockType
+//import com.luxalpa.structuredhighlights.shared.BlockType
 //import com.luxalpa.structuredhighlights.DefinitionBlockDescriptor
 //import com.luxalpa.structuredhighlights.Descriptor
 //import com.luxalpa.structuredhighlights.Kind
-//import com.luxalpa.structuredhighlights.LanguageSupport
+//import com.luxalpa.structuredhighlights.shared.LanguageSupport
 //import org.intellij.lang.annotations.Language
 //import org.rust.openapiext.document
 //import java.awt.Color

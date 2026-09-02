@@ -1,13 +1,8 @@
-package com.luxalpa.structuredhighlights.languages
+package com.luxalpa.structuredhighlights.shared
 
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.endOffset
 import com.intellij.psi.util.startOffset
-import com.luxalpa.structuredhighlights.BlockType
-import com.luxalpa.structuredhighlights.DefinitionBlockDescriptor
-import com.luxalpa.structuredhighlights.Descriptor
-import com.luxalpa.structuredhighlights.Kind
-import com.luxalpa.structuredhighlights.Mode
 import java.awt.Color
 
 // For handling nesting.

@@ -11,40 +11,12 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Key
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
+import com.luxalpa.structuredhighlights.shared.BlockType
+import com.luxalpa.structuredhighlights.shared.DefinitionBlockDescriptor
+import com.luxalpa.structuredhighlights.shared.Kind
+import com.luxalpa.structuredhighlights.shared.LanguageSupport
+import com.luxalpa.structuredhighlights.shared.Mode
 import java.awt.Color
-
-enum class Mode {
-    FULL_LINE,
-    EXACT_RANGE;
-}
-
-data class DefinitionBlockDescriptor(
-    val startOffset: Int,
-    val endOffset: Int,
-    val blockType: BlockType,
-
-    // Currently unused, might be reenabled later though.
-    // This is the block type it would be if it wasn't overridden by the higher-level block.
-    val actualType: BlockType,
-
-    val kind: Kind = Kind.Block,
-    val mode: Mode = Mode.FULL_LINE
-)
-
-enum class Kind {
-    Block, Header, Subheader, Identifier;
-
-    // The renderer draws these from high to low for some reason.
-    val layer: Int
-        get() = when (this) {
-            Block -> 2
-            Header -> 1
-            Subheader -> 1
-            Identifier -> 0
-        }
-}
-
-data class Descriptor(val kind: Kind, val element: PsiElement)
 
 private val LX_DESCRIPTORS: Key<List<DefinitionBlockDescriptor>> = Key.create("LX_DESCRIPTORS")
 private val LX_HIGHLIGHTERS: Key<MutableList<RangeHighlighter>> = Key.create("LX_HIGHLIGHTERS")

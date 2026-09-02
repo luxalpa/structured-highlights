@@ -24,6 +24,7 @@ import com.intellij.openapi.util.NlsContexts
 import com.intellij.ui.LanguageTextField
 import com.intellij.ui.dsl.builder.panel
 import com.intellij.util.EventDispatcher
+import com.luxalpa.structuredhighlights.shared.LanguageSupport
 import java.awt.Color
 import java.awt.event.ActionEvent
 import javax.swing.JComponent

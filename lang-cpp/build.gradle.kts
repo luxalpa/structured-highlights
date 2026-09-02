@@ -1,6 +1,6 @@
 dependencies {
-//    implementation(project(":shared"))
+    implementation(project(":shared"))
     intellijPlatform {
-        bundledModule("intellij.css")
+        bundledModule("intellij.rider.cpp.core.languages")
     }
 }

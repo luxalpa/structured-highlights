@@ -15,7 +15,7 @@ class LxLanguageTextField(
     languageId: String,
     val options: ColorAndFontOptions? = null,
 ) :
-    LanguageTextField(Language.findLanguageByID(languageId)!!, project, text, false) {
+    LanguageTextField(Language.findLanguageByID(languageId) ?: Language.ANY, project, text, false) {
 
     init {
         this.font = EditorFontType.PLAIN.globalFont

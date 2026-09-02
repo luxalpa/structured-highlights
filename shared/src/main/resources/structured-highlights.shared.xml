@@ -1,3 +1,7 @@
 <idea-plugin>
-
+    <extensionPoints>
+        <extensionPoint qualifiedName="com.luxalpa.structuredhighlights.languageSupport"
+                        interface="com.luxalpa.structuredhighlights.shared.LanguageSupport"
+                        dynamic="true"/>
+    </extensionPoints>
 </idea-plugin>

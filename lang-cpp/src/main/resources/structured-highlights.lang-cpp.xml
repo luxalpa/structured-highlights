@@ -1,13 +1,9 @@
 <idea-plugin>
     <dependencies>
-        <module name="structuredhighlights.shared"/>
-        <module name="intellij.css"/>
+        <module name="structured-highlights.shared"/>
+        <module name="intellij.rider.cpp.core.languages"/>
     </dependencies>
-
-    <!--    <actions>-->
-    <!--        <action id="com.github.novotnyr.mincssrel.css.CssAction"-->
-    <!--                class="com.github.novotnyr.mincssrel.css.CssAction"-->
-    <!--                text="Invoke CSS Action"-->
-    <!--        />-->
-    <!--    </actions>-->
+    <extensions defaultExtensionNs="com.luxalpa.structuredhighlights">
+        <languageSupport implementation="com.luxalpa.structuredhighlights.CppLangSupp"/>
+    </extensions>
 </idea-plugin>

@@ -4,7 +4,7 @@
     <name>Structured Highlights</name>
     <vendor>Luxalpa</vendor>
 
-    <depends>com.intellij.modules.platform</depends>
+    <!--    <depends>com.intellij.modules.platform</depends>-->
     <!--    <depends optional="true" config-file="myplugin-rust.xml">com.jetbrains.rust</depends>-->
     <!--    <depends optional="true" config-file="myplugin-toml.xml">org.toml.lang</depends>-->
     <!--    <depends optional="true" config-file="myplugin-kotlin.xml">org.jetbrains.kotlin</depends>-->
@@ -26,11 +26,6 @@
 
     <resource-bundle>messages.MyBundle</resource-bundle>
 
-    <extensionPoints>
-        <extensionPoint name="languageSupport" interface="com.luxalpa.structuredhighlights.LanguageSupport"
-                        dynamic="true"/>
-    </extensionPoints>
-
     <extensions defaultExtensionNs="com.intellij">
         <applicationConfigurable instance="com.luxalpa.structuredhighlights.LxConfigurable"
                                  key="pluginName"
@@ -45,4 +40,8 @@
         <highlightingPassFactory implementation="com.luxalpa.structuredhighlights.LxHighlightingPassFactory"/>
         <colorAndFontDescriptorProvider implementation="com.luxalpa.structuredhighlights.LxColorsPageFactory"/>
     </extensions>
+    <dependencies>
+        <module name="intellij.platform.monolith"/>
+        <module name="structured-highlights.shared"/>
+    </dependencies>
 </idea-plugin>

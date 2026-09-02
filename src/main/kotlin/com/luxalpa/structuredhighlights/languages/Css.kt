@@ -7,11 +7,11 @@
 //import com.intellij.psi.css.CssKeyframesRule
 //import com.intellij.psi.css.CssMedia
 //import com.intellij.psi.css.CssRuleset
-//import com.luxalpa.structuredhighlights.BlockType
+//import com.luxalpa.structuredhighlights.shared.BlockType
 //import com.luxalpa.structuredhighlights.DefinitionBlockDescriptor
 //import com.luxalpa.structuredhighlights.Descriptor
 //import com.luxalpa.structuredhighlights.Kind
-//import com.luxalpa.structuredhighlights.LanguageSupport
+//import com.luxalpa.structuredhighlights.shared.LanguageSupport
 //import org.intellij.lang.annotations.Language
 //import java.awt.Color
 //

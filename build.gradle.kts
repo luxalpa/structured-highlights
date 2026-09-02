@@ -1,4 +1,5 @@
 import org.jetbrains.changelog.markdownToHTML
+import org.jetbrains.intellij.platform.gradle.IntelliJPlatformType
 
 plugins {
     id("org.jetbrains.kotlin.jvm")
@@ -8,6 +9,13 @@ plugins {
 
 tasks.runIde {
     jvmArgs("-Didea.log.debug.categories=StructuredHighlights")
+    environment("PYTHONDONTWRITEBYTECODE", "1")
+}
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(23))
+    }
 }
 
 subprojects {
@@ -23,10 +31,12 @@ subprojects {
 
 dependencies {
     intellijPlatform {
-        rustRover("2026.2")
+//        rustRover("2026.2")
+        clion("2026.2")
 //        phpstorm("2025.2")
 //        intellijIdea("2025.2")
 //        rider("2025.2")
+        bundledModule("intellij.platform.monolith")
 
         // Plugin Dependencies -> https://plugins.jetbrains.com/docs/intellij/plugin-dependencies.html
 //        plugins(
@@ -62,5 +72,13 @@ tasks.patchPluginXml {
             }
             subList(indexOf(start) + 1, indexOf(end)).joinToString("\n").let(::markdownToHTML)
         }
+    }
+}
+
+val runCLion by intellijPlatformTesting.runIde.registering {
+    type = IntelliJPlatformType.CLion
+    version = "2026.2"
+    task {
+        environment("PYTHONDONTWRITEBYTECODE", "1")
     }
 }

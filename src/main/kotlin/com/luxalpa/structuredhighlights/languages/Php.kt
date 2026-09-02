@@ -4,11 +4,11 @@
 //import com.intellij.psi.PsiElement
 //import com.intellij.psi.PsiFile
 //import com.intellij.psi.util.PsiTreeUtil
-//import com.luxalpa.structuredhighlights.BlockType
+//import com.luxalpa.structuredhighlights.shared.BlockType
 //import com.luxalpa.structuredhighlights.DefinitionBlockDescriptor
 //import com.luxalpa.structuredhighlights.Descriptor
 //import com.luxalpa.structuredhighlights.Kind
-//import com.luxalpa.structuredhighlights.LanguageSupport
+//import com.luxalpa.structuredhighlights.shared.LanguageSupport
 //import com.jetbrains.php.lang.psi.PhpFile
 //import com.jetbrains.php.lang.psi.elements.Function
 //import com.jetbrains.php.lang.psi.elements.GroupStatement
