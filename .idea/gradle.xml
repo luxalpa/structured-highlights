@@ -12,7 +12,11 @@
             <option value="$PROJECT_DIR$/lang-cpp" />
             <option value="$PROJECT_DIR$/lang-csharp" />
             <option value="$PROJECT_DIR$/lang-css" />
+            <option value="$PROJECT_DIR$/lang-go" />
+            <option value="$PROJECT_DIR$/lang-java" />
             <option value="$PROJECT_DIR$/lang-javascript" />
+            <option value="$PROJECT_DIR$/lang-kotlin" />
+            <option value="$PROJECT_DIR$/lang-php" />
             <option value="$PROJECT_DIR$/lang-python" />
             <option value="$PROJECT_DIR$/lang-rust" />
             <option value="$PROJECT_DIR$/lang-scss" />

@@ -68,10 +68,10 @@ dependencies {
     // The following language modules target IDEs other than the currently-active one (CLion) and
     // therefore only compile when the matching IDE is selected above. Uncomment them together with
     // the appropriate IDE dependency (e.g. `intellijIdea(...)`, `phpstorm(...)`, `goland(...)`).
-//    implementation(project(":lang-java"))
-//    implementation(project(":lang-kotlin"))
-//    implementation(project(":lang-php"))
-//    implementation(project(":lang-go"))
+    implementation(project(":lang-java"))
+    implementation(project(":lang-kotlin"))
+    implementation(project(":lang-php"))
+    implementation(project(":lang-go"))
 }
 
 tasks.patchPluginXml {
@@ -110,7 +110,7 @@ val runRustRover by intellijPlatformTesting.runIde.registering {
     }
 }
 
-// Java / Kotlin / JavaScript / TypeScript
+// Java / Kotlin
 val runIdea by intellijPlatformTesting.runIde.registering {
     type = IntelliJPlatformType.IntellijIdeaUltimate
     version = "2026.2"

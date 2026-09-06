@@ -1,6 +1,7 @@
 <idea-plugin>
     <dependencies>
         <module name="structured-highlights.shared"/>
+        <module name="intellij.java.psi"/>
         <plugin id="org.jetbrains.kotlin"/>
     </dependencies>
     <extensions defaultExtensionNs="com.luxalpa.structuredhighlights">

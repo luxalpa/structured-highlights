@@ -4,9 +4,9 @@ import com.goide.psi.GoFile
 import com.goide.psi.GoFunctionDeclaration
 import com.goide.psi.GoInterfaceType
 import com.goide.psi.GoMethodDeclaration
+import com.goide.psi.GoRecursiveVisitor
 import com.goide.psi.GoStructType
 import com.goide.psi.GoTypeSpec
-import com.goide.psi.impl.GoRecursiveVisitor
 import com.intellij.openapi.editor.colors.ColorKey
 import com.intellij.psi.PsiFile
 import com.luxalpa.structuredhighlights.shared.BlockCollector
@@ -83,7 +83,11 @@ class GoVisitor : GoRecursiveVisitor() {
         }
     }
 
-    private fun collectFunction(element: com.intellij.psi.PsiElement, name: com.intellij.psi.PsiElement?, visit: () -> Unit) {
+    private fun collectFunction(
+        element: com.intellij.psi.PsiElement,
+        name: com.intellij.psi.PsiElement?,
+        visit: () -> Unit
+    ) {
         val descriptors = buildList {
             // Currently, we don't allow blocks inside blocks due to performance issues.
             if (collector.isTopLevel) {

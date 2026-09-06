@@ -1,6 +1,8 @@
 dependencies {
     implementation(project(":shared"))
     intellijPlatform {
-        bundledModule("intellij.java.impl")
+        intellijIdea("2026.2")
+        bundledModule("intellij.java")
+        bundledModule("intellij.java.psi")
     }
 }

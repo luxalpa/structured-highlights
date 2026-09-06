@@ -28,15 +28,11 @@
 
         <!-- These language modules target IDEs other than the currently-active one (CLion) and are
              only built when the matching IDE and project dependency are enabled in build.gradle.kts. -->
-<!--        <module name="structured-highlights.lang-java" loading="optional"/>-->
-<!--        <module name="structured-highlights.lang-kotlin" loading="optional"/>-->
-<!--        <module name="structured-highlights.lang-php" loading="optional"/>-->
-<!--        <module name="structured-highlights.lang-go" loading="optional"/>-->
+        <module name="structured-highlights.lang-java" loading="optional"/>
+        <module name="structured-highlights.lang-kotlin" loading="optional"/>
+        <module name="structured-highlights.lang-php" loading="optional"/>
+        <module name="structured-highlights.lang-go" loading="optional"/>
     </content>
-
-    <!--    <extensions defaultExtensionNs="org.jetbrains.kotlin">-->
-    <!--        <supportsKotlinPluginMode supportsK2="true"/>-->
-    <!--    </extensions>-->
 
     <resource-bundle>messages.MyBundle</resource-bundle>
 
