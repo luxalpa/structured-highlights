@@ -3,18 +3,6 @@
     <id>com.luxalpa.structuredhighlights</id>
     <name>Structured Highlights</name>
     <vendor>Luxalpa</vendor>
-
-    <!--    <depends>com.intellij.modules.platform</depends>-->
-    <!--    <depends optional="true" config-file="myplugin-rust.xml">com.jetbrains.rust</depends>-->
-    <!--    <depends optional="true" config-file="myplugin-toml.xml">org.toml.lang</depends>-->
-    <!--    <depends optional="true" config-file="myplugin-kotlin.xml">org.jetbrains.kotlin</depends>-->
-    <!--    <depends optional="true" config-file="myplugin-java.xml">com.intellij.java</depends>-->
-    <!--    <depends optional="true" config-file="myplugin-php.xml">com.jetbrains.php</depends>-->
-    <!--    <depends optional="true" config-file="myplugin-csharp.xml">com.intellij.modules.rider</depends>-->
-    <!--    <depends optional="true" config-file="myplugin-javascript.xml">JavaScript</depends>-->
-    <!--    <depends optional="true" config-file="myplugin-css.xml">com.intellij.css</depends>-->
-    <!--    <depends optional="true" config-file="myplugin-scss.xml">org.jetbrains.plugins.sass</depends>-->
-    <!--    <depends optional="true" config-file="myplugin-svelte.xml">dev.blachut.svelte.lang</depends>-->
     <content>
         <module name="structured-highlights.shared" loading="required"/>
         <module name="structured-highlights.lang-cpp" loading="optional"/>
@@ -25,9 +13,6 @@
         <module name="structured-highlights.lang-javascript" loading="optional"/>
         <module name="structured-highlights.lang-python" loading="optional"/>
         <module name="structured-highlights.lang-csharp" loading="optional"/>
-
-        <!-- These language modules target IDEs other than the currently-active one (CLion) and are
-             only built when the matching IDE and project dependency are enabled in build.gradle.kts. -->
         <module name="structured-highlights.lang-java" loading="optional"/>
         <module name="structured-highlights.lang-kotlin" loading="optional"/>
         <module name="structured-highlights.lang-php" loading="optional"/>
