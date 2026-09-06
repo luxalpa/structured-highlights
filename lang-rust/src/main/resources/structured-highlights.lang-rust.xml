@@ -1,0 +1,10 @@
+<idea-plugin>
+    <dependencies>
+        <module name="structured-highlights.shared"/>
+        <module name="intellij.rustrover.core"/>
+        <module name="intellij.rustrover.common"/>
+    </dependencies>
+    <extensions defaultExtensionNs="com.luxalpa.structuredhighlights">
+        <languageSupport implementation="com.luxalpa.structuredhighlights.Rust"/>
+    </extensions>
+</idea-plugin>

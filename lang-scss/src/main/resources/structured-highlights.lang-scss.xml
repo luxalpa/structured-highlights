@@ -1,0 +1,12 @@
+<idea-plugin>
+    <dependencies>
+        <module name="structured-highlights.shared"/>
+        <module name="structured-highlights.lang-css"/>
+        <module name="intellij.sass"/>
+        <module name="intellij.css"/>
+        <module name="intellij.css.common.psi"/>
+    </dependencies>
+    <extensions defaultExtensionNs="com.luxalpa.structuredhighlights">
+        <languageSupport implementation="com.luxalpa.structuredhighlights.ScssLangSupp"/>
+    </extensions>
+</idea-plugin>

@@ -55,6 +55,9 @@ dependencies {
     }
     implementation(project(":shared"))
     implementation(project(":lang-cpp"))
+    implementation(project(":lang-rust"))
+    implementation(project(":lang-css"))
+    implementation(project(":lang-scss"))
 }
 
 tasks.patchPluginXml {
@@ -79,6 +82,16 @@ val runCLion by intellijPlatformTesting.runIde.registering {
     type = IntelliJPlatformType.CLion
     version = "2026.2"
     task {
+        jvmArgs("-Didea.log.debug.categories=StructuredHighlights")
+        environment("PYTHONDONTWRITEBYTECODE", "1")
+    }
+}
+
+val runRustRover by intellijPlatformTesting.runIde.registering {
+    type = IntelliJPlatformType.RustRover
+    version = "2026.2"
+    task {
+        jvmArgs("-Didea.log.debug.categories=StructuredHighlights")
         environment("PYTHONDONTWRITEBYTECODE", "1")
     }
 }

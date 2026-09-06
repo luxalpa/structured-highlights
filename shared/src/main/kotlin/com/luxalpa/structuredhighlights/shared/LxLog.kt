@@ -1,4 +1,4 @@
-package com.luxalpa.structuredhighlights
+package com.luxalpa.structuredhighlights.shared
 
 import com.intellij.openapi.diagnostic.Logger
 

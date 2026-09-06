@@ -58,4 +58,15 @@ allows people to roll back to an earlier version in case of breakage. However, c
 will then discard any of the newer version's properties. This could theoretically be resolved by using different files
 instead for different versions, however, this use-case seems too narrow imo to be worth the implementation effort.
 
+### Useful Commands
+
+Finding language modules:
+
+```shell
+CLION=$(find ~/.gradle/caches -type d -name 'CLion-2026.2' | head -1)
+find "$CLION" -name '*.jar' -print0 | xargs -0 -I{} sh -c 'unzip -l "{}" 2>/dev/null | grep CssFile && echo {}' 
+```
+
+Replace `CssFile` with whichever symbol you want to find.
+
 [template]: https://github.com/JetBrains/intellij-platform-plugin-template

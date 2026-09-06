@@ -28,4 +28,7 @@ dependencyResolutionManagement {
 }
 
 include("lang-cpp")
+include("lang-rust")
+include("lang-css")
+include("lang-scss")
 include("shared")

@@ -11,7 +11,9 @@ import com.intellij.ui.components.JBScrollPane
 import com.intellij.ui.dsl.builder.bindValue
 import com.intellij.ui.dsl.builder.panel
 import com.intellij.util.ui.JBUI
+import com.luxalpa.structuredhighlights.shared.LOGGER
 import com.luxalpa.structuredhighlights.shared.LanguageSupport
+import com.luxalpa.structuredhighlights.shared.debug
 import java.awt.BorderLayout
 import javax.swing.JComponent
 import javax.swing.JPanel

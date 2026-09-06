@@ -12,6 +12,7 @@ import com.intellij.util.xmlb.Converter
 import com.intellij.util.xmlb.annotations.Attribute
 import com.intellij.util.xmlb.annotations.Tag
 import com.luxalpa.structuredhighlights.shared.Kind
+import com.luxalpa.structuredhighlights.shared.debug
 import java.awt.Color
 
 @Service
