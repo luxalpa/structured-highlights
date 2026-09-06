@@ -1,0 +1,8 @@
+<idea-plugin>
+    <dependencies>
+        <module name="structured-highlights.shared"/>
+    </dependencies>
+    <extensions defaultExtensionNs="com.luxalpa.structuredhighlights">
+        <languageSupport implementation="com.luxalpa.structuredhighlights.CSharp"/>
+    </extensions>
+</idea-plugin>

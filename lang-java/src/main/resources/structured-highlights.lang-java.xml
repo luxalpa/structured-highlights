@@ -1,0 +1,9 @@
+<idea-plugin>
+    <dependencies>
+        <module name="structured-highlights.shared"/>
+        <module name="intellij.java.impl"/>
+    </dependencies>
+    <extensions defaultExtensionNs="com.luxalpa.structuredhighlights">
+        <languageSupport implementation="com.luxalpa.structuredhighlights.Java"/>
+    </extensions>
+</idea-plugin>

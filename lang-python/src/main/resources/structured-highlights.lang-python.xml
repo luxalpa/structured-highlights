@@ -1,0 +1,10 @@
+<idea-plugin>
+    <dependencies>
+        <module name="structured-highlights.shared"/>
+        <module name="intellij.python.psi"/>
+        <module name="intellij.python.ast"/>
+    </dependencies>
+    <extensions defaultExtensionNs="com.luxalpa.structuredhighlights">
+        <languageSupport implementation="com.luxalpa.structuredhighlights.Python"/>
+    </extensions>
+</idea-plugin>

@@ -10,9 +10,13 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/lang-cpp" />
+            <option value="$PROJECT_DIR$/lang-csharp" />
             <option value="$PROJECT_DIR$/lang-css" />
+            <option value="$PROJECT_DIR$/lang-javascript" />
+            <option value="$PROJECT_DIR$/lang-python" />
             <option value="$PROJECT_DIR$/lang-rust" />
             <option value="$PROJECT_DIR$/lang-scss" />
+            <option value="$PROJECT_DIR$/lang-toml" />
             <option value="$PROJECT_DIR$/shared" />
           </set>
         </option>

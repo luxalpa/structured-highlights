@@ -1,0 +1,9 @@
+<idea-plugin>
+    <dependencies>
+        <module name="structured-highlights.shared"/>
+        <plugin id="com.jetbrains.php"/>
+    </dependencies>
+    <extensions defaultExtensionNs="com.luxalpa.structuredhighlights">
+        <languageSupport implementation="com.luxalpa.structuredhighlights.Php"/>
+    </extensions>
+</idea-plugin>

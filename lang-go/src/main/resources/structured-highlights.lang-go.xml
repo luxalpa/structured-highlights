@@ -1,0 +1,9 @@
+<idea-plugin>
+    <dependencies>
+        <module name="structured-highlights.shared"/>
+        <plugin id="org.jetbrains.plugins.go"/>
+    </dependencies>
+    <extensions defaultExtensionNs="com.luxalpa.structuredhighlights">
+        <languageSupport implementation="com.luxalpa.structuredhighlights.Go"/>
+    </extensions>
+</idea-plugin>

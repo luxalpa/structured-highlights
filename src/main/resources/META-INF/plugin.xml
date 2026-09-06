@@ -21,6 +21,17 @@
         <module name="structured-highlights.lang-rust" loading="optional"/>
         <module name="structured-highlights.lang-css" loading="optional"/>
         <module name="structured-highlights.lang-scss" loading="optional"/>
+        <module name="structured-highlights.lang-toml" loading="optional"/>
+        <module name="structured-highlights.lang-javascript" loading="optional"/>
+        <module name="structured-highlights.lang-python" loading="optional"/>
+        <module name="structured-highlights.lang-csharp" loading="optional"/>
+
+        <!-- These language modules target IDEs other than the currently-active one (CLion) and are
+             only built when the matching IDE and project dependency are enabled in build.gradle.kts. -->
+<!--        <module name="structured-highlights.lang-java" loading="optional"/>-->
+<!--        <module name="structured-highlights.lang-kotlin" loading="optional"/>-->
+<!--        <module name="structured-highlights.lang-php" loading="optional"/>-->
+<!--        <module name="structured-highlights.lang-go" loading="optional"/>-->
     </content>
 
     <!--    <extensions defaultExtensionNs="org.jetbrains.kotlin">-->

@@ -1,0 +1,9 @@
+<idea-plugin>
+    <dependencies>
+        <module name="structured-highlights.shared"/>
+        <module name="intellij.javascript.psi.impl"/>
+    </dependencies>
+    <extensions defaultExtensionNs="com.luxalpa.structuredhighlights">
+        <languageSupport implementation="com.luxalpa.structuredhighlights.JavaScript"/>
+    </extensions>
+</idea-plugin>
