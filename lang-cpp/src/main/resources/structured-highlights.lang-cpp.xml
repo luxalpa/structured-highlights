@@ -1,9 +1,0 @@
-<idea-plugin>
-    <dependencies>
-        <module name="structured-highlights.shared"/>
-        <module name="intellij.rider.cpp.core.languages"/>
-    </dependencies>
-    <extensions defaultExtensionNs="com.luxalpa.structuredhighlights">
-        <languageSupport implementation="com.luxalpa.structuredhighlights.CppLangSupp"/>
-    </extensions>
-</idea-plugin>

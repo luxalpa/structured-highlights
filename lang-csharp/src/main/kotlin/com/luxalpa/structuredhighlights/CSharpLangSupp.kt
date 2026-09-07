@@ -5,6 +5,7 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiNameIdentifierOwner
 import com.intellij.psi.PsiRecursiveElementVisitor
+import com.jetbrains.rider.languages.fileTypes.csharp.psi.CSharpFile
 import com.luxalpa.structuredhighlights.shared.BlockCollector
 import com.luxalpa.structuredhighlights.shared.BlockType
 import com.luxalpa.structuredhighlights.shared.DefaultColor
@@ -19,7 +20,7 @@ import java.awt.Color
 
 class CSharp : LanguageSupport {
     override fun collectDescriptors(file: PsiFile): List<DefinitionBlockDescriptor>? {
-        if (file.language.id != LANGUAGE_ID) return null
+        val file = file as? CSharpFile ?: return null
         val visitor = CSharpVisitor()
         file.accept(visitor)
         return visitor.collector.definitions

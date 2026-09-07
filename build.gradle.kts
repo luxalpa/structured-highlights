@@ -31,32 +31,12 @@ subprojects {
 
 dependencies {
     intellijPlatform {
-//        rustRover("2026.2")
-        clion("2026.2")
-//        phpstorm("2026.2")
-//        intellijIdea("2026.2")   // Ultimate: Java / Kotlin / JavaScript / TypeScript
-//        rider("2026.2")          // C#
-//        goland("2026.2")         // Go
-//        pycharmProfessional("2026.2") // Python (also bundled in CLion)
+        rustRover("2026.2")
         bundledModule("intellij.platform.monolith")
-
-        // Plugin Dependencies -> https://plugins.jetbrains.com/docs/intellij/plugin-dependencies.html
-//        plugins(
-//            "com.jetbrains.rust:252.23892.452",
-//            "org.jetbrains.kotlin:252.28539.97-IJ",
-//            "com.intellij.java:252.23892.409",
-//            "com.jetbrains.php:252.23892.458",
-//            "org.toml.lang:252.28238.9",
-//            "dev.blachut.svelte.lang:252.23892.298",
-//            "com.intellij.css:252.27397.28",
-//            "org.jetbrains.plugins.sass:252.23892.358",
-//        )
-//        plugins("JavaScript:252.23892.452")
-
-//        bundledPlugin("JavaScript")
     }
+
     implementation(project(":shared"))
-    implementation(project(":lang-cpp"))
+
     implementation(project(":lang-rust"))
     implementation(project(":lang-css"))
     implementation(project(":lang-scss"))
@@ -64,10 +44,6 @@ dependencies {
     implementation(project(":lang-javascript"))
     implementation(project(":lang-python"))
     implementation(project(":lang-csharp"))
-
-    // The following language modules target IDEs other than the currently-active one (CLion) and
-    // therefore only compile when the matching IDE is selected above. Uncomment them together with
-    // the appropriate IDE dependency (e.g. `intellijIdea(...)`, `phpstorm(...)`, `goland(...)`).
     implementation(project(":lang-java"))
     implementation(project(":lang-kotlin"))
     implementation(project(":lang-php"))
@@ -155,6 +131,7 @@ val runRider by intellijPlatformTesting.runIde.registering {
     type = IntelliJPlatformType.Rider
     version = "2026.2"
     task {
+        useInstaller = false
         jvmArgs("-Didea.log.debug.categories=StructuredHighlights")
         environment("PYTHONDONTWRITEBYTECODE", "1")
     }

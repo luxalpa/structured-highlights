@@ -5,7 +5,6 @@
     <vendor>Luxalpa</vendor>
     <content>
         <module name="structured-highlights.shared" loading="required"/>
-        <module name="structured-highlights.lang-cpp" loading="optional"/>
         <module name="structured-highlights.lang-rust" loading="optional"/>
         <module name="structured-highlights.lang-css" loading="optional"/>
         <module name="structured-highlights.lang-scss" loading="optional"/>
