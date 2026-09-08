@@ -34,6 +34,12 @@
         <highlightingPassFactory implementation="com.luxalpa.structuredhighlights.LxHighlightingPassFactory"/>
         <colorAndFontDescriptorProvider implementation="com.luxalpa.structuredhighlights.LxColorsPageFactory"/>
     </extensions>
+    <actions>
+        <action id="com.luxalpa.structuredhighlights.LxToggleDiffHighlightsAction"
+                class="com.luxalpa.structuredhighlights.LxToggleDiffHighlightsAction">
+            <add-to-group group-id="Diff.ViewerSettings" anchor="last"/>
+        </action>
+    </actions>
     <dependencies>
         <module name="intellij.platform.monolith"/>
         <module name="structured-highlights.shared"/>

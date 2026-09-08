@@ -10,6 +10,7 @@ import com.intellij.openapi.ui.DialogPanel
 import com.intellij.openapi.util.NlsContexts
 import com.intellij.ui.JBColor
 import com.intellij.ui.components.JBScrollPane
+import com.intellij.ui.dsl.builder.bindSelected
 import com.intellij.ui.dsl.builder.bindValue
 import com.intellij.ui.dsl.builder.panel
 import com.intellij.util.ui.JBUI
@@ -95,6 +96,11 @@ class AppSettingsComponent {
 
                     settings.select(colors)
                 }
+            }
+            row {
+                checkBox(MyBundle.message("settings.disableInDiff"))
+                    .bindSelected(LxApplicationSettings.instance::disableInDiff)
+                    .onApply { restartHighlighting() }
             }
             group("Opacity") {
                 row("Normal:") {

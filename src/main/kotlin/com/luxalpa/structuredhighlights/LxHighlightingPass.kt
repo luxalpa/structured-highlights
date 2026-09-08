@@ -2,6 +2,7 @@ package com.luxalpa.structuredhighlights
 
 import com.intellij.codeHighlighting.*
 import com.intellij.codeHighlighting.TextEditorHighlightingPassRegistrar.Anchor
+import com.intellij.codeInsight.daemon.DaemonCodeAnalyzer
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.EditorKind
 import com.intellij.openapi.editor.markup.*
@@ -9,8 +10,8 @@ import com.intellij.openapi.editor.markup.CustomHighlighterOrder
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.util.Key
-import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.luxalpa.structuredhighlights.shared.BlockType
 import com.luxalpa.structuredhighlights.shared.DefinitionBlockDescriptor
@@ -21,6 +22,13 @@ import java.awt.Color
 
 private val LX_DESCRIPTORS: Key<List<DefinitionBlockDescriptor>> = Key.create("LX_DESCRIPTORS")
 private val LX_HIGHLIGHTERS: Key<MutableList<RangeHighlighter>> = Key.create("LX_HIGHLIGHTERS")
+
+/** Re-runs the highlighting passes on all open projects so changes apply to already-open editors. */
+fun restartHighlighting() {
+    for (project in ProjectManager.getInstance().openProjects) {
+        DaemonCodeAnalyzer.getInstance(project).restart("Structured Highlights: diff highlighting toggled")
+    }
+}
 
 class LxHighlightingPassFactory : TextEditorHighlightingPassFactoryRegistrar, TextEditorHighlightingPassFactory,
     DumbAware {
@@ -40,18 +48,20 @@ class LxHighlightingPassFactory : TextEditorHighlightingPassFactoryRegistrar, Te
     override fun createHighlightingPass(
         file: PsiFile,
         editor: Editor
-    ): TextEditorHighlightingPass? {
-        // Don't run inside diff viewers.
-        if (editor.editorKind == EditorKind.DIFF) return null
-        return LxHighlightingPass(file, editor)
-    }
+    ): TextEditorHighlightingPass = LxHighlightingPass(file, editor)
 }
 
 class LxHighlightingPass(
     private val file: PsiFile,
     private val editor: Editor
 ) : TextEditorHighlightingPass(file.project, editor.document, false), DumbAware {
+    // Highlighting is suppressed inside diff viewers when the corresponding setting is enabled.
+    private val isSuppressed: Boolean
+        get() = editor.editorKind == EditorKind.DIFF && LxApplicationSettings.instance.disableInDiff
+
     override fun doCollectInformation(progress: ProgressIndicator) {
+        if (isSuppressed) return
+
         val descriptors = LanguageSupport.EP.extensionList
             .firstNotNullOfOrNull { it.collectDescriptors(file) }
             ?: return
@@ -60,14 +70,16 @@ class LxHighlightingPass(
     }
 
     override fun doApplyInformationToEditor() {
-        val descriptors = editor.getUserData(LX_DESCRIPTORS) ?: return
-
         // Remove old highlighters.
         val oldHighlighters = editor.getUserData(LX_HIGHLIGHTERS)
         oldHighlighters?.forEach { it.dispose() }
         oldHighlighters?.clear()
-
         editor.putUserData(LX_HIGHLIGHTERS, null)
+
+        // Bail out (after clearing) when suppressed, so toggling the setting removes existing highlights.
+        if (isSuppressed) return
+
+        val descriptors = editor.getUserData(LX_DESCRIPTORS) ?: return
 
         val markupModel = editor.markupModel
         val newHighlighters = mutableListOf<RangeHighlighter>()

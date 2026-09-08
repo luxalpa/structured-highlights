@@ -128,6 +128,12 @@ class LxApplicationSettings :
             updateCurrentSettings { it.copy(opacityIdentifier = value) }
         }
 
+    var disableInDiff: Boolean
+        get() = currentSettings.disableInDiff
+        set(value) {
+            updateCurrentSettings { it.copy(disableInDiff = value) }
+        }
+
     val previewSettings: PreviewSettings
         get() = myPreviewSettings ?: PreviewSettings(
             opacityNormal,
@@ -165,6 +171,7 @@ class LxApplicationSettings :
         @JvmField var opacityHeader: Double = 0.064,
         @JvmField var opacitySubheader: Double = 0.05,
         @JvmField var opacityIdentifier: Double = 0.105,
+        @JvmField var disableInDiff: Boolean = true,
     )
 
     @Tag("color")
