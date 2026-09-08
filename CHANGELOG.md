@@ -10,14 +10,15 @@
     - TOML
     - Kotlin
     - Java
-    - PHP
+    - PHP (experimental)
     - C#
     - JavaScript
     - TypeScript
     - CSS
     - SCSS
-    - Go
+    - Go (experimental)
     - Python
+- (Internal) moved to a split-plugin architecture, which is why we now require 2026.2+.
 
 ## [1.0.2] - 2026-08-21
 

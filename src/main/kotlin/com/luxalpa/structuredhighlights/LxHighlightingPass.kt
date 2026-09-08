@@ -3,6 +3,7 @@ package com.luxalpa.structuredhighlights
 import com.intellij.codeHighlighting.*
 import com.intellij.codeHighlighting.TextEditorHighlightingPassRegistrar.Anchor
 import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.editor.EditorKind
 import com.intellij.openapi.editor.markup.*
 import com.intellij.openapi.editor.markup.CustomHighlighterOrder
 import com.intellij.openapi.progress.ProgressIndicator
@@ -39,7 +40,11 @@ class LxHighlightingPassFactory : TextEditorHighlightingPassFactoryRegistrar, Te
     override fun createHighlightingPass(
         file: PsiFile,
         editor: Editor
-    ): TextEditorHighlightingPass = LxHighlightingPass(file, editor)
+    ): TextEditorHighlightingPass? {
+        // Don't run inside diff viewers.
+        if (editor.editorKind == EditorKind.DIFF) return null
+        return LxHighlightingPass(file, editor)
+    }
 }
 
 class LxHighlightingPass(
