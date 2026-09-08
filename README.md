@@ -60,7 +60,7 @@ instead for different versions, however, this use-case seems too narrow imo to b
 
 ### Useful Commands
 
-Finding language modules:
+#### Finding modules containing language classes:
 
 ```shell
 CLION=$(find ~/.gradle/caches -type d -name 'CLion-2026.2' | head -1)
@@ -68,5 +68,32 @@ find "$CLION" -name '*.jar' -print0 | xargs -0 -I{} sh -c 'unzip -l "{}" 2>/dev/
 ```
 
 Replace `CssFile` with whichever symbol you want to find.
+
+Use this command to find the IDE's name for the command above (if it's not CLion):
+
+```shell
+find ~/.gradle/caches -type d -name '*2026.2'
+```
+
+#### Find language ID's
+
+```kotlin
+com.intellij.lang.Language.getRegisteredLanguages()
+    .sortedBy { it.id }
+    .forEach { LOGGER.warn("${it.id} | ${it.displayName}") }
+```
+
+(You can put this code into `createComponent()` for example)
+
+#### Find (Color) Settings Pages
+
+```kotlin
+val groups =
+    ShowSettingsUtilImpl.getConfigurableGroups(project, true).toList()
+ConfigurableVisitor.findAll(ConfigurableVisitor.ALL, groups)
+    .map { ConfigurableVisitor.getId(it) }
+    .sorted()
+    .forEach { println(it) }
+```
 
 [template]: https://github.com/JetBrains/intellij-platform-plugin-template

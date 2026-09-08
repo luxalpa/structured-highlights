@@ -52,7 +52,7 @@ dependencies {
 
 tasks.patchPluginXml {
     // Supported build number ranges and IntelliJ Platform versions -> https://plugins.jetbrains.com/docs/intellij/build-number-ranges.html
-    sinceBuild = "242"
+    sinceBuild = "262"
     untilBuild = provider { null }
 
     pluginDescription = providers.fileContents(layout.projectDirectory.file("README.md")).asText.map {

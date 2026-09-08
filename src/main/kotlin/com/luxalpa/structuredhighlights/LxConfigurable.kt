@@ -1,7 +1,9 @@
 package com.luxalpa.structuredhighlights
 
 import com.intellij.ide.DataManager
+import com.intellij.ide.actions.ShowSettingsUtilImpl
 import com.intellij.openapi.options.Configurable
+import com.intellij.openapi.options.ex.ConfigurableVisitor
 import com.intellij.openapi.options.ex.Settings
 import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.ui.DialogPanel
@@ -24,10 +26,6 @@ class LxConfigurable : Configurable, Configurable.NoScroll, Configurable.NoMargi
     override fun getDisplayName(): @NlsContexts.ConfigurableName String = MyBundle.message("pluginName")
 
     override fun createComponent(): JComponent {
-        com.intellij.lang.Language.getRegisteredLanguages()
-            .sortedBy { it.id }
-            .forEach { LOGGER.warn("${it.id} | ${it.displayName}") }
-
         mySettingsComponent = AppSettingsComponent()
         return mySettingsComponent!!.getPanel()
     }
@@ -87,8 +85,14 @@ class AppSettingsComponent {
                         DataManager.getInstance().getDataContext(myMainPanel)
                     ) ?: return@link
 
+                    debug { "Got context" }
+
                     val colors =
-                        settings.find("reference.settingsdialog.IDE.editor.colors.Structured Highlights") ?: return@link
+                        settings.find("reference.settingsdialog.IDE.editor.colors.com.luxalpa.structuredhighlights.LxColorsPageFactory")
+                            ?: return@link
+
+                    debug { "Found settings" }
+
                     settings.select(colors)
                 }
             }
