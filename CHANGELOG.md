@@ -18,6 +18,7 @@
     - SCSS
     - Go (experimental)
     - Python
+- Added a setting for disabling the Highlighter on the Diff-View. Can also be toggled from the diff-viewers settings.
 - (Internal) moved to a split-plugin architecture, which is why we now require 2026.2+.
 
 ## [1.0.2] - 2026-08-21
