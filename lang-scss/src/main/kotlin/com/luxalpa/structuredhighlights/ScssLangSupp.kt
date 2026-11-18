@@ -5,14 +5,14 @@ import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiNameIdentifierOwner
 import com.luxalpa.structuredhighlights.shared.BlockCollector
 import com.luxalpa.structuredhighlights.shared.BlockType
-import com.luxalpa.structuredhighlights.shared.DefaultColor
+import com.luxalpa.structuredhighlights.shared.BaseColor
+import com.luxalpa.structuredhighlights.shared.blockColorKey
 import com.luxalpa.structuredhighlights.shared.DefinitionBlockDescriptor
 import com.luxalpa.structuredhighlights.shared.LanguageSupport
 import org.intellij.lang.annotations.Language
 import org.jetbrains.plugins.scss.SCSSElementTypes
 import org.jetbrains.plugins.scss.psi.SCSSFile
 import org.jetbrains.plugins.scss.psi.SassScssFunctionDeclaration
-import java.awt.Color
 
 class ScssLangSupp : LanguageSupport {
     override val blockTypes: List<BlockType> = ScssBlockType.entries
@@ -48,13 +48,13 @@ class ScssLangSupp : LanguageSupport {
 
 enum class ScssBlockType(
     override val label: String,
-    override val defaultColor: Color,
+    override val baseColor: BaseColor,
 ) : BlockType {
-    MIXIN("Mixin", DefaultColor.CLASS),
-    FUNCTION("Function", DefaultColor.FUNCTION);
+    MIXIN("Mixin", BaseColor.CLASS),
+    FUNCTION("Function", BaseColor.FUNCTION);
 
     override val key: String = "LUX_SH_SCSS_BG_$name"
-    override val colorKey: ColorKey = ColorKey.createColorKey(key, defaultColor)
+    override val colorKey: ColorKey = blockColorKey(key, baseColor)
 }
 
 @Language("SCSS")

@@ -24,6 +24,7 @@ import com.intellij.openapi.util.NlsContexts
 import com.intellij.ui.LanguageTextField
 import com.intellij.ui.dsl.builder.panel
 import com.intellij.util.EventDispatcher
+import com.luxalpa.structuredhighlights.shared.BaseColor
 import com.luxalpa.structuredhighlights.shared.LanguageSupport
 import com.luxalpa.structuredhighlights.shared.debug
 import java.awt.Color
@@ -97,13 +98,21 @@ class LxColorsPageFactory : ColorAndFontPanelFactory, ColorAndFontDescriptorsPro
             }
         }
 
-        return (
-                pluginColors + ColorDescriptor(
-                    "General//Caret Row",
-                    EditorColors.CARET_ROW_COLOR,
-                    ColorDescriptor.Kind.BACKGROUND
-                )
-                ).toTypedArray()
+        val baseColors = BaseColor.entries.map { base ->
+            ColorDescriptor(
+                "General//Base Colors//${base.label}",
+                base.colorKey,
+                ColorDescriptor.Kind.BACKGROUND
+            )
+        }
+
+        val caretRow = ColorDescriptor(
+            "General//Caret Row",
+            EditorColors.CARET_ROW_COLOR,
+            ColorDescriptor.Kind.BACKGROUND
+        )
+
+        return (baseColors + caretRow + pluginColors).toTypedArray()
     }
 
     override fun getDisplayName(): @NlsContexts.ConfigurableName String = MyBundle.message("pluginName")

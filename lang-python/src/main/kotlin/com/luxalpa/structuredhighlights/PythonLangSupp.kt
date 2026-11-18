@@ -8,13 +8,13 @@ import com.jetbrains.python.psi.PyFunction
 import com.jetbrains.python.psi.PyRecursiveElementVisitor
 import com.luxalpa.structuredhighlights.shared.BlockCollector
 import com.luxalpa.structuredhighlights.shared.BlockType
-import com.luxalpa.structuredhighlights.shared.DefaultColor
+import com.luxalpa.structuredhighlights.shared.BaseColor
+import com.luxalpa.structuredhighlights.shared.blockColorKey
 import com.luxalpa.structuredhighlights.shared.DefinitionBlockDescriptor
 import com.luxalpa.structuredhighlights.shared.Descriptor
 import com.luxalpa.structuredhighlights.shared.Kind
 import com.luxalpa.structuredhighlights.shared.LanguageSupport
 import org.intellij.lang.annotations.Language
-import java.awt.Color
 
 class Python : LanguageSupport {
     override val languageId: String = "Python"
@@ -32,13 +32,13 @@ class Python : LanguageSupport {
 
 enum class PyBlockType(
     override val label: String,
-    override val defaultColor: Color,
+    override val baseColor: BaseColor,
 ) : BlockType {
-    CLASS("Class", DefaultColor.CLASS),
-    FUNCTION("Function", DefaultColor.FUNCTION);
+    CLASS("Class", BaseColor.CLASS),
+    FUNCTION("Function", BaseColor.FUNCTION);
 
     override val key: String get() = "LUX_SH_PYTHON_BG_$name"
-    override val colorKey: ColorKey = ColorKey.createColorKey(key, defaultColor)
+    override val colorKey: ColorKey = blockColorKey(key, baseColor)
 }
 
 class PythonVisitor : PyRecursiveElementVisitor() {

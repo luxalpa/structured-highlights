@@ -4,7 +4,8 @@ import com.intellij.openapi.editor.colors.ColorKey
 import com.intellij.psi.PsiFile
 import com.luxalpa.structuredhighlights.shared.BlockCollector
 import com.luxalpa.structuredhighlights.shared.BlockType
-import com.luxalpa.structuredhighlights.shared.DefaultColor
+import com.luxalpa.structuredhighlights.shared.BaseColor
+import com.luxalpa.structuredhighlights.shared.blockColorKey
 import com.luxalpa.structuredhighlights.shared.DefinitionBlockDescriptor
 import com.luxalpa.structuredhighlights.shared.LanguageSupport
 import org.intellij.lang.annotations.Language
@@ -14,7 +15,6 @@ import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtNamedFunction
 import org.jetbrains.kotlin.psi.KtObjectDeclaration
 import org.jetbrains.kotlin.psi.KtTreeVisitorVoid
-import java.awt.Color
 
 class Kotlin : LanguageSupport {
     override fun collectDescriptors(file: PsiFile): List<DefinitionBlockDescriptor>? {
@@ -32,16 +32,16 @@ class Kotlin : LanguageSupport {
 
 enum class KtBlockType(
     override val label: String,
-    override val defaultColor: Color,
+    override val baseColor: BaseColor,
 ) : BlockType {
-    CLASS("Class", DefaultColor.CLASS),
-    FUNCTION("Function", DefaultColor.FUNCTION),
-    INTERFACE("Interface", DefaultColor.INTERFACE),
-    ENUM("Enum", DefaultColor.ENUM),
-    OBJECT("Object", DefaultColor.CLASS);
+    CLASS("Class", BaseColor.CLASS),
+    FUNCTION("Function", BaseColor.FUNCTION),
+    INTERFACE("Interface", BaseColor.INTERFACE),
+    ENUM("Enum", BaseColor.ENUM),
+    OBJECT("Object", BaseColor.CLASS);
 
     override val key: String get() = "LUX_SH_KOTLIN_BG_$name"
-    override val colorKey: ColorKey = ColorKey.createColorKey(key, defaultColor)
+    override val colorKey: ColorKey = blockColorKey(key, baseColor)
 }
 
 class KotlinVisitor : KtTreeVisitorVoid() {

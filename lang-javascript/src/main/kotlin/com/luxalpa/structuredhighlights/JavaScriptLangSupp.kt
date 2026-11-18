@@ -12,14 +12,14 @@ import com.intellij.openapi.editor.colors.ColorKey
 import com.intellij.psi.PsiFile
 import com.luxalpa.structuredhighlights.shared.BlockCollector
 import com.luxalpa.structuredhighlights.shared.BlockType
-import com.luxalpa.structuredhighlights.shared.DefaultColor
+import com.luxalpa.structuredhighlights.shared.BaseColor
+import com.luxalpa.structuredhighlights.shared.blockColorKey
 import com.luxalpa.structuredhighlights.shared.DefinitionBlockDescriptor
 import com.luxalpa.structuredhighlights.shared.Descriptor
 import com.luxalpa.structuredhighlights.shared.Kind
 import com.luxalpa.structuredhighlights.shared.LanguageSupport
 import com.luxalpa.structuredhighlights.shared.lineSpan
 import org.intellij.lang.annotations.Language
-import java.awt.Color
 
 class JavaScript : LanguageSupport {
     override val displayName: String = "JavaScript / TypeScript"
@@ -82,15 +82,15 @@ class JavaScript : LanguageSupport {
 
 enum class TsBlockType(
     override val label: String,
-    override val defaultColor: Color,
+    override val baseColor: BaseColor,
 ) : BlockType {
-    FUNCTION("Function", DefaultColor.FUNCTION),
-    CLASS("Class", DefaultColor.CLASS),
-    INTERFACE("Interface", DefaultColor.INTERFACE),
-    TYPEDECL("Type alias", DefaultColor.STRUCT);
+    FUNCTION("Function", BaseColor.FUNCTION),
+    CLASS("Class", BaseColor.CLASS),
+    INTERFACE("Interface", BaseColor.INTERFACE),
+    TYPEDECL("Type alias", BaseColor.STRUCT);
 
     override val key: String get() = "LUX_SH_JS_BG_$name"
-    override val colorKey: ColorKey = ColorKey.createColorKey(key, defaultColor)
+    override val colorKey: ColorKey = blockColorKey(key, baseColor)
 }
 
 @Language("TypeScript")

@@ -11,13 +11,13 @@ import com.intellij.openapi.editor.colors.ColorKey
 import com.intellij.psi.PsiFile
 import com.luxalpa.structuredhighlights.shared.BlockCollector
 import com.luxalpa.structuredhighlights.shared.BlockType
-import com.luxalpa.structuredhighlights.shared.DefaultColor
+import com.luxalpa.structuredhighlights.shared.BaseColor
+import com.luxalpa.structuredhighlights.shared.blockColorKey
 import com.luxalpa.structuredhighlights.shared.DefinitionBlockDescriptor
 import com.luxalpa.structuredhighlights.shared.Descriptor
 import com.luxalpa.structuredhighlights.shared.Kind
 import com.luxalpa.structuredhighlights.shared.LanguageSupport
 import org.intellij.lang.annotations.Language
-import java.awt.Color
 
 class Go : LanguageSupport {
     override val languageId: String = "go"
@@ -35,14 +35,14 @@ class Go : LanguageSupport {
 
 enum class GoBlockType(
     override val label: String,
-    override val defaultColor: Color,
+    override val baseColor: BaseColor,
 ) : BlockType {
-    STRUCT("Struct", DefaultColor.STRUCT),
-    INTERFACE("Interface", DefaultColor.INTERFACE),
-    FUNCTION("Function", DefaultColor.FUNCTION);
+    STRUCT("Struct", BaseColor.STRUCT),
+    INTERFACE("Interface", BaseColor.INTERFACE),
+    FUNCTION("Function", BaseColor.FUNCTION);
 
     override val key: String get() = "LUX_SH_GO_BG_$name"
-    override val colorKey: ColorKey = ColorKey.createColorKey(key, defaultColor)
+    override val colorKey: ColorKey = blockColorKey(key, baseColor)
 }
 
 class GoVisitor : GoRecursiveVisitor() {

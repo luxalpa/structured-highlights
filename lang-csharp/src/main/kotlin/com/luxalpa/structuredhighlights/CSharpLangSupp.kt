@@ -8,13 +8,13 @@ import com.intellij.psi.PsiRecursiveElementVisitor
 import com.jetbrains.rider.languages.fileTypes.csharp.psi.CSharpFile
 import com.luxalpa.structuredhighlights.shared.BlockCollector
 import com.luxalpa.structuredhighlights.shared.BlockType
-import com.luxalpa.structuredhighlights.shared.DefaultColor
+import com.luxalpa.structuredhighlights.shared.BaseColor
+import com.luxalpa.structuredhighlights.shared.blockColorKey
 import com.luxalpa.structuredhighlights.shared.DefinitionBlockDescriptor
 import com.luxalpa.structuredhighlights.shared.Descriptor
 import com.luxalpa.structuredhighlights.shared.Kind
 import com.luxalpa.structuredhighlights.shared.LanguageSupport
 import org.intellij.lang.annotations.Language
-import java.awt.Color
 
 // Rider uses Resharper / Language Server Protocol for C#. The AI generated this stuff. Don't look at it too much!
 
@@ -38,18 +38,18 @@ class CSharp : LanguageSupport {
 
 enum class CSharpBlockType(
     override val label: String,
-    override val defaultColor: Color,
+    override val baseColor: BaseColor,
 ) : BlockType {
-    CLASS("Class", DefaultColor.CLASS),
-    STRUCT("Struct", DefaultColor.STRUCT),
-    INTERFACE("Interface", DefaultColor.INTERFACE),
-    ENUM("Enum", DefaultColor.ENUM),
-    RECORD("Record", DefaultColor.STRUCT),
-    FUNCTION("Function", DefaultColor.FUNCTION),
-    NAMESPACE("Namespace", DefaultColor.MODULE);
+    CLASS("Class", BaseColor.CLASS),
+    STRUCT("Struct", BaseColor.STRUCT),
+    INTERFACE("Interface", BaseColor.INTERFACE),
+    ENUM("Enum", BaseColor.ENUM),
+    RECORD("Record", BaseColor.STRUCT),
+    FUNCTION("Function", BaseColor.FUNCTION),
+    NAMESPACE("Namespace", BaseColor.MODULE);
 
     override val key: String get() = "LUX_SH_CSHARP_BG_$name"
-    override val colorKey: ColorKey = ColorKey.createColorKey(key, defaultColor)
+    override val colorKey: ColorKey = blockColorKey(key, baseColor)
 }
 
 class CSharpVisitor : PsiRecursiveElementVisitor() {

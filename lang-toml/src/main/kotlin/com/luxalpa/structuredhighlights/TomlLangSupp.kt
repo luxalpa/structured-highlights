@@ -4,7 +4,8 @@ import com.intellij.openapi.editor.colors.ColorKey
 import com.intellij.psi.PsiFile
 import com.luxalpa.structuredhighlights.shared.BlockCollector
 import com.luxalpa.structuredhighlights.shared.BlockType
-import com.luxalpa.structuredhighlights.shared.DefaultColor
+import com.luxalpa.structuredhighlights.shared.BaseColor
+import com.luxalpa.structuredhighlights.shared.blockColorKey
 import com.luxalpa.structuredhighlights.shared.DefinitionBlockDescriptor
 import com.luxalpa.structuredhighlights.shared.Descriptor
 import com.luxalpa.structuredhighlights.shared.Kind
@@ -13,7 +14,6 @@ import org.intellij.lang.annotations.Language
 import org.toml.lang.psi.TomlFile
 import org.toml.lang.psi.TomlRecursiveVisitor
 import org.toml.lang.psi.TomlTable
-import java.awt.Color
 
 class Toml : LanguageSupport {
     override val languageId: String = "TOML"
@@ -31,12 +31,12 @@ class Toml : LanguageSupport {
 
 enum class TomlBlockType(
     override val label: String,
-    override val defaultColor: Color,
+    override val baseColor: BaseColor,
 ) : BlockType {
-    TABLE("Table", DefaultColor.STRUCT);
+    TABLE("Table", BaseColor.STRUCT);
 
     override val key: String get() = "LUX_SH_TOML_BG_$name"
-    override val colorKey: ColorKey = ColorKey.createColorKey(key, defaultColor)
+    override val colorKey: ColorKey = blockColorKey(key, baseColor)
 }
 
 // TODO: Consider just loading the list of Tables instead of using a visitor.

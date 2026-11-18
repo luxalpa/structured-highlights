@@ -9,11 +9,11 @@ import com.intellij.psi.css.CssMedia
 import com.intellij.psi.css.CssRuleset
 import com.luxalpa.structuredhighlights.shared.BlockCollector
 import com.luxalpa.structuredhighlights.shared.BlockType
-import com.luxalpa.structuredhighlights.shared.DefaultColor
+import com.luxalpa.structuredhighlights.shared.BaseColor
+import com.luxalpa.structuredhighlights.shared.blockColorKey
 import com.luxalpa.structuredhighlights.shared.DefinitionBlockDescriptor
 import com.luxalpa.structuredhighlights.shared.LanguageSupport
 import org.intellij.lang.annotations.Language
-import java.awt.Color
 
 class CssLangSupp : LanguageSupport {
     override val languageId: String = "CSS"
@@ -52,14 +52,14 @@ fun BlockCollector.collectCssChild(child: PsiElement) {
 
 enum class CssBlockType(
     override val label: String,
-    override val defaultColor: Color,
+    override val baseColor: BaseColor,
 ) : BlockType {
-    RULESET("Ruleset", DefaultColor.STRUCT),
-    MEDIA("Media Query", DefaultColor.STRUCT),
-    KEYFRAMES("Keyframes", DefaultColor.ENUM);
+    RULESET("Ruleset", BaseColor.STRUCT),
+    MEDIA("Media Query", BaseColor.STRUCT),
+    KEYFRAMES("Keyframes", BaseColor.ENUM);
 
     override val key: String = "LUX_SH_CSS_BG_$name"
-    override val colorKey: ColorKey = ColorKey.createColorKey(key, defaultColor)
+    override val colorKey: ColorKey = blockColorKey(key, baseColor)
 }
 
 @Language("CSS")

@@ -1,5 +1,6 @@
 package com.luxalpa.structuredhighlights.shared
 
+import com.intellij.openapi.editor.colors.ColorKey
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.endOffset
 import com.intellij.psi.util.startOffset
@@ -68,27 +69,40 @@ fun lineSpan(element: PsiElement): Int {
     return endLine - startLine + 1
 }
 
-class DefaultColor {
-    companion object {
-        // A plain-old-data type
-        val STRUCT = Color(-16756225)
+/**
+ * The base colors shown under "General" on the color settings page. Every language-specific block color inherits from
+ * one of these (via a fallback [ColorKey]) unless the user disables the inheritance for it.
+ */
+enum class BaseColor(val label: String, val defaultColor: Color) {
+    // A plain-old-data type
+    STRUCT("Struct", Color(-16756225)),
 
-        // A block containing method implementations
-        val CLASS = Color(-20992)
+    // A block containing method implementations
+    CLASS("Class", Color(-20992)),
 
-        // Enumeration: List of instances of a type
-        val ENUM = Color(-2490113)
+    // Enumeration: List of instances of a type
+    ENUM("Enum", Color(-2490113)),
 
-        // A free-standing function
-        val FUNCTION = Color(-842752)
+    // A free-standing function
+    FUNCTION("Function", Color(-842752)),
 
-        // Some form of submodule or namespace
-        val MODULE = Color(-10066330)
+    // Some form of submodule or namespace
+    MODULE("Module", Color(-10066330)),
 
-        // a type that contains method-stubs which should be implemented or fulfilled somewhere
-        val INTERFACE = Color(-16521928)
+    // a type that contains method-stubs which should be implemented or fulfilled somewhere
+    INTERFACE("Interface", Color(-16521928)),
 
-        // A definition of a meta-programming construct.
-        val MACRO_DEFINITION = Color(-10066330)
-    }
+    // A definition of a meta-programming construct.
+    MACRO_DEFINITION("Macro Definition", Color(-10066330));
+
+    val colorKey: ColorKey = ColorKey.createColorKey("LUX_SH_BASE_$name", defaultColor)
 }
+
+/**
+ * Creates the color key for a language-specific block type that inherits from [base].
+ *
+ * The key intentionally has no default color of its own: the color scheme prefers a key's own default over its
+ * fallback's, so a default here would break inheritance.
+ */
+fun blockColorKey(externalName: String, base: BaseColor): ColorKey =
+    ColorKey.createColorKeyWithFallback(externalName, base.colorKey)

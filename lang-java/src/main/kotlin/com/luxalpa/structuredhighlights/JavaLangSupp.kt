@@ -8,13 +8,13 @@ import com.intellij.psi.PsiJavaFile
 import com.intellij.psi.PsiMethod
 import com.luxalpa.structuredhighlights.shared.BlockCollector
 import com.luxalpa.structuredhighlights.shared.BlockType
-import com.luxalpa.structuredhighlights.shared.DefaultColor
+import com.luxalpa.structuredhighlights.shared.BaseColor
+import com.luxalpa.structuredhighlights.shared.blockColorKey
 import com.luxalpa.structuredhighlights.shared.DefinitionBlockDescriptor
 import com.luxalpa.structuredhighlights.shared.Descriptor
 import com.luxalpa.structuredhighlights.shared.Kind
 import com.luxalpa.structuredhighlights.shared.LanguageSupport
 import org.intellij.lang.annotations.Language
-import java.awt.Color
 
 class Java : LanguageSupport {
     override fun collectDescriptors(file: PsiFile): List<DefinitionBlockDescriptor>? {
@@ -32,15 +32,15 @@ class Java : LanguageSupport {
 
 enum class JavaBlockType(
     override val label: String,
-    override val defaultColor: Color,
+    override val baseColor: BaseColor,
 ) : BlockType {
-    CLASS("Class", DefaultColor.STRUCT),
-    INTERFACE("Interface", DefaultColor.INTERFACE),
-    ANNOTATION("Annotation Type", DefaultColor.MACRO_DEFINITION),
-    ENUM("Enum", DefaultColor.ENUM);
+    CLASS("Class", BaseColor.STRUCT),
+    INTERFACE("Interface", BaseColor.INTERFACE),
+    ANNOTATION("Annotation Type", BaseColor.MACRO_DEFINITION),
+    ENUM("Enum", BaseColor.ENUM);
 
     override val key: String get() = "LUX_SH_JAVA_BG_$name"
-    override val colorKey: ColorKey = ColorKey.createColorKey(key, defaultColor)
+    override val colorKey: ColorKey = blockColorKey(key, baseColor)
 }
 
 class JavaVisitor : JavaRecursiveElementVisitor() {

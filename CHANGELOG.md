@@ -4,6 +4,8 @@
 
 ## [Unreleased]
 
+- Settings for the colors now use inheritance.
+
 ## [2.0.0] - 2026-09-10
 
 - Color `macro_rules` definitions

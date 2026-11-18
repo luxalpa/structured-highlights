@@ -13,13 +13,13 @@ import com.jetbrains.php.lang.psi.elements.PhpNamespace
 import com.jetbrains.php.lang.psi.visitors.PhpElementVisitor
 import com.luxalpa.structuredhighlights.shared.BlockCollector
 import com.luxalpa.structuredhighlights.shared.BlockType
-import com.luxalpa.structuredhighlights.shared.DefaultColor
+import com.luxalpa.structuredhighlights.shared.BaseColor
+import com.luxalpa.structuredhighlights.shared.blockColorKey
 import com.luxalpa.structuredhighlights.shared.DefinitionBlockDescriptor
 import com.luxalpa.structuredhighlights.shared.Descriptor
 import com.luxalpa.structuredhighlights.shared.Kind
 import com.luxalpa.structuredhighlights.shared.LanguageSupport
 import org.intellij.lang.annotations.Language
-import java.awt.Color
 
 class Php : LanguageSupport {
     override fun collectDescriptors(file: PsiFile): List<DefinitionBlockDescriptor>? {
@@ -37,17 +37,17 @@ class Php : LanguageSupport {
 
 enum class PhpBlockType(
     override val label: String,
-    override val defaultColor: Color,
+    override val baseColor: BaseColor,
 ) : BlockType {
-    CLASS("Class", DefaultColor.CLASS),
-    INTERFACE("Interface", DefaultColor.INTERFACE),
-    TRAIT("Trait", DefaultColor.INTERFACE),
-    ENUM("Enum", DefaultColor.ENUM),
-    FUNCTION("Function", DefaultColor.FUNCTION),
-    NAMESPACE("Namespace", DefaultColor.MODULE);
+    CLASS("Class", BaseColor.CLASS),
+    INTERFACE("Interface", BaseColor.INTERFACE),
+    TRAIT("Trait", BaseColor.INTERFACE),
+    ENUM("Enum", BaseColor.ENUM),
+    FUNCTION("Function", BaseColor.FUNCTION),
+    NAMESPACE("Namespace", BaseColor.MODULE);
 
     override val key: String get() = "LUX_SH_PHP_BG_$name"
-    override val colorKey: ColorKey = ColorKey.createColorKey(key, defaultColor)
+    override val colorKey: ColorKey = blockColorKey(key, baseColor)
 }
 
 class PhpVisitor : PhpElementVisitor() {

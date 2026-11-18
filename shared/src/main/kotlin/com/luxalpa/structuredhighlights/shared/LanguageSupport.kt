@@ -23,7 +23,8 @@ interface LanguageSupport {
 interface BlockType {
     val label: String
     val key: String
-    val defaultColor: Color
+    val baseColor: BaseColor
+    val defaultColor: Color get() = baseColor.defaultColor
     val colorKey: ColorKey
 }
 

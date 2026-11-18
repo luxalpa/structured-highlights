@@ -4,7 +4,8 @@ import com.intellij.openapi.editor.colors.ColorKey
 import com.intellij.psi.PsiFile
 import com.luxalpa.structuredhighlights.shared.BlockCollector
 import com.luxalpa.structuredhighlights.shared.BlockType
-import com.luxalpa.structuredhighlights.shared.DefaultColor
+import com.luxalpa.structuredhighlights.shared.BaseColor
+import com.luxalpa.structuredhighlights.shared.blockColorKey
 import com.luxalpa.structuredhighlights.shared.DefinitionBlockDescriptor
 import com.luxalpa.structuredhighlights.shared.Descriptor
 import com.luxalpa.structuredhighlights.shared.Kind
@@ -20,7 +21,6 @@ import org.rust.lang.core.psi.RsRecursiveVisitor
 import org.rust.lang.core.psi.RsStructItem
 import org.rust.lang.core.psi.RsTraitItem
 import org.rust.lang.core.psi.ext.body
-import java.awt.Color
 
 class Rust : LanguageSupport {
     override fun collectDescriptors(file: PsiFile): List<DefinitionBlockDescriptor>? {
@@ -38,18 +38,18 @@ class Rust : LanguageSupport {
 
 enum class RsBlockType(
     override val label: String,
-    override val defaultColor: Color,
+    override val baseColor: BaseColor,
 ) : BlockType {
-    ENUM("Enum", DefaultColor.ENUM),
-    STRUCT("Struct", DefaultColor.STRUCT),
-    TRAIT("Trait", DefaultColor.INTERFACE),
-    IMPL("Impl", DefaultColor.CLASS),
-    FUNCTION("Function", DefaultColor.FUNCTION),
-    MODULE("Module", DefaultColor.MODULE),
-    MACRORULES("Macro Definition", DefaultColor.MACRO_DEFINITION);
+    ENUM("Enum", BaseColor.ENUM),
+    STRUCT("Struct", BaseColor.STRUCT),
+    TRAIT("Trait", BaseColor.INTERFACE),
+    IMPL("Impl", BaseColor.CLASS),
+    FUNCTION("Function", BaseColor.FUNCTION),
+    MODULE("Module", BaseColor.MODULE),
+    MACRORULES("Macro Definition", BaseColor.MACRO_DEFINITION);
 
     override val key: String get() = "LUX_SH_RUST_BG_$name"
-    override val colorKey: ColorKey = ColorKey.createColorKey(key, defaultColor)
+    override val colorKey: ColorKey = blockColorKey(key, baseColor)
 }
 
 class RustVisitor : RsRecursiveVisitor() {
