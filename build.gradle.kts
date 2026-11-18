@@ -50,6 +50,13 @@ dependencies {
     implementation(project(":lang-go"))
 }
 
+intellijPlatform {
+    publishing {
+        // reads -Pchannel=... or env, defaults to "default" (stable)
+        channels = listOf(providers.gradleProperty("channel").getOrElse("default"))
+    }
+}
+
 tasks.patchPluginXml {
     // Supported build number ranges and IntelliJ Platform versions -> https://plugins.jetbrains.com/docs/intellij/build-number-ranges.html
     sinceBuild = "262"
