@@ -52,8 +52,14 @@ dependencies {
 
 intellijPlatform {
     publishing {
-        // reads -Pchannel=... or env, defaults to "default" (stable)
-        channels = listOf(providers.gradleProperty("channel").getOrElse("default"))
+        // reads -Pchannel=... (comma-separated, e.g. -Pchannel=beta) or env.
+        // Defaults to "default,beta": stable releases are also uploaded to beta, because
+        // since IDE 2026.3 users who installed from beta only receive updates from beta.
+        channels = providers.gradleProperty("channel")
+            .getOrElse("default,beta")
+            .split(',')
+            .map { it.trim() }
+            .filter { it.isNotEmpty() }
     }
 }
 
