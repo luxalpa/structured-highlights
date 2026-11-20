@@ -7,12 +7,21 @@
 <!-- Plugin description -->
 Highlight entire blocks of code in different colors!
 
-- The initial version only supports Rust, more languages will come when I can find the time.
-- Colors and opacity values are configurable under <kbd>Editor</kbd> → <kbd>Color Scheme</kbd> → <kbd>Structured
-  Highlights</kbd> (it's at the very bottom)
+- Color values are configurable under <kbd>Editor</kbd> → <kbd>Color Scheme</kbd> → <kbd>Structured Highlights</kbd>
+  (it's at the very bottom)
+- Opacity values and other settings can be found in <kbd>Editor</kbd> → <kbd>Structured Highlights</kbd>
+- You can adjust the Caret Row's Opacity on the color scheme page. This is a bit of a hack, because it edits the value
+  of the caret row in IDEA's color scheme which isn't owned by this plugin. That means this value will persist plugin
+  uninstall. And it might be reset by IDEA updates (since it's not originally supposed to have opacity).
+- You can turn on/off the highlighting on the diff view.
 
-Don't hesitate to open an issue on GitHub if there's anything you'd like to see added (including other languages). Note
-for dark mode, you need to go into the settings and adjust the colors a bit as it doesn't yet contain a preset for that.
+Notes:
+
+The creator of this plugin is primarily using Rust and TOML. Other languages have been added for completeness but not
+necessarily have gotten the same amount of care/quality. Don't hesitate to open an issue!
+
+_AI Disclaimer: Most of the code was handwritten, but AI was used for minor features and fixes and several of the
+parsers / sample codes for other languages (as they are more or less identical to the first few)._
 
 <!-- Plugin description end -->
 
