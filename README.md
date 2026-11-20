@@ -29,9 +29,8 @@ parsers / sample codes for other languages (as they are more or less identical t
 
 - Using the IDE built-in plugin system:
 
-  <kbd>Settings/Preferences</kbd> > <kbd>Plugins</kbd> > <kbd>Marketplace</kbd> > <kbd>Search for "Structured
-  Highlights"</kbd> >
-  <kbd>Install</kbd>
+  <kbd>Settings/Preferences</kbd> > <kbd>Plugins</kbd> > <kbd>Marketplace</kbd> >
+  <kbd>Search for "Structured Highlights"</kbd> > <kbd>Install</kbd>
 
 - Using JetBrains Marketplace:
 

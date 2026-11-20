@@ -84,33 +84,10 @@ class RustVisitor : RsRecursiveVisitor() {
             return
         }
 
-        val descriptors = buildList {
-            // Currently, we don't allow blocks inside blocks due to performance issues.
-            if (collector.isTopLevel) {
-                add(Descriptor(Kind.Block, o))
-            }
-            o.identifier.let {
-                add(Descriptor(if (collector.isTopLevel) Kind.Header else Kind.Subheader, it))
-                add(Descriptor(Kind.Identifier, it))
-            }
-        }
-
-        collector.collect(RsBlockType.FUNCTION, descriptors) {
-            super.visitFunction(o)
-        }
+        collector.collectBlock(RsBlockType.FUNCTION, o, o.identifier)
     }
 
     override fun visitModItem(o: RsModItem) {
-        // Modules will still be colored like their parents, but freestanding modules will not pass on their
-        // color to their children.
-        val descriptors = buildList {
-            add(Descriptor(Kind.Block, o))
-            o.identifier.let {
-                add(Descriptor(Kind.Header, it))
-                add(Descriptor(Kind.Identifier, it))
-            }
-        }
-
         collector.collectBlock(RsBlockType.MODULE, o, o.identifier, useForChildren = false) {
             super.visitModItem(o)
         }

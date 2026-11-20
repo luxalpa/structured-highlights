@@ -7,6 +7,7 @@
 ## [2.1.0] - 2026-11-20
 
 - Settings for the colors now use inheritance.
+- Rust: No longer highlight blocks inside functions (like local structs)
 
 ## [2.0.0] - 2026-09-10
 
