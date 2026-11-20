@@ -1,6 +1,5 @@
 # structured-highlights
 
-![Build](https://github.com/luxalpa/structured-highlights/workflows/Build/badge.svg)
 [![Version](https://img.shields.io/jetbrains/plugin/v/28073-structured-highlights.svg)](https://plugins.jetbrains.com/plugin/28073-structured-highlights)
 [![Downloads](https://img.shields.io/jetbrains/plugin/d/28073-structured-highlights.svg)](https://plugins.jetbrains.com/plugin/28073-structured-highlights)
 
